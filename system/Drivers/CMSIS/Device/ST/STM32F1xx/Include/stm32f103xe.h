@@ -9,7 +9,7 @@
   *          This file contains:
   *           - Data structures and the address mapping for all peripherals
   *           - Peripheral's registers declarations and bits definition
-  *           - Macros to access peripheral’s registers hardware
+  *           - Macros to access peripheralï¿½s registers hardware
   *
   ******************************************************************************
   * @attention
@@ -48,7 +48,7 @@
   * @brief Configuration of the Cortex-M3 Processor and Core Peripherals
  */
 #define __CM3_REV                  0x0200U  /*!< Core Revision r2p0                           */
- #define __MPU_PRESENT             0U       /*!< Other STM32 devices does not provide an MPU  */
+#define __MPU_PRESENT              0U       /*!< Other STM32 devices does not provide an MPU  */
 #define __NVIC_PRIO_BITS           4U       /*!< STM32 uses 4 Bits for the Priority Levels    */
 #define __Vendor_SysTickConfig     0U       /*!< Set to 1 if different SysTick Config is used */
 
@@ -538,6 +538,8 @@ typedef struct
 {
   __IO uint32_t CR;
   __IO uint32_t CSR;
+  __IO uint32_t CTRL2;
+  __IO uint32_t CTRL3;
 } PWR_TypeDef;
 
 /**
@@ -557,6 +559,9 @@ typedef struct
   __IO uint32_t BDCR;
   __IO uint32_t CSR;
 
+  __IO uint32_t AHBPRST;
+  __IO uint32_t CFG2;
+  __IO uint32_t CFG3;
 
 } RCC_TypeDef;
 
@@ -1303,7 +1308,7 @@ typedef struct
 /*!< SW configuration */
 #define RCC_CFGR_SW_Pos                      (0U)
 #define RCC_CFGR_SW_Msk                      (0x3UL << RCC_CFGR_SW_Pos)         /*!< 0x00000003 */
-#define RCC_CFGR_SW                          RCC_CFGR_SW_Msk                   /*!< SW[1:0] bits (System clock Switch) */
+#define RCC_CFGR_SW                          RCC_CFGR_SW_Msk                    /*!< SW[1:0] bits (System clock Switch) */
 #define RCC_CFGR_SW_0                        (0x1UL << RCC_CFGR_SW_Pos)         /*!< 0x00000001 */
 #define RCC_CFGR_SW_1                        (0x2UL << RCC_CFGR_SW_Pos)         /*!< 0x00000002 */
 
@@ -1314,7 +1319,7 @@ typedef struct
 /*!< SWS configuration */
 #define RCC_CFGR_SWS_Pos                     (2U)
 #define RCC_CFGR_SWS_Msk                     (0x3UL << RCC_CFGR_SWS_Pos)        /*!< 0x0000000C */
-#define RCC_CFGR_SWS                         RCC_CFGR_SWS_Msk                  /*!< SWS[1:0] bits (System Clock Switch Status) */
+#define RCC_CFGR_SWS                         RCC_CFGR_SWS_Msk                   /*!< SWS[1:0] bits (System Clock Switch Status) */
 #define RCC_CFGR_SWS_0                       (0x1UL << RCC_CFGR_SWS_Pos)        /*!< 0x00000004 */
 #define RCC_CFGR_SWS_1                       (0x2UL << RCC_CFGR_SWS_Pos)        /*!< 0x00000008 */
 
@@ -1325,7 +1330,7 @@ typedef struct
 /*!< HPRE configuration */
 #define RCC_CFGR_HPRE_Pos                    (4U)
 #define RCC_CFGR_HPRE_Msk                    (0xFUL << RCC_CFGR_HPRE_Pos)       /*!< 0x000000F0 */
-#define RCC_CFGR_HPRE                        RCC_CFGR_HPRE_Msk                 /*!< HPRE[3:0] bits (AHB prescaler) */
+#define RCC_CFGR_HPRE                        RCC_CFGR_HPRE_Msk                  /*!< HPRE[3:0] bits (AHB prescaler) */
 #define RCC_CFGR_HPRE_0                      (0x1UL << RCC_CFGR_HPRE_Pos)       /*!< 0x00000010 */
 #define RCC_CFGR_HPRE_1                      (0x2UL << RCC_CFGR_HPRE_Pos)       /*!< 0x00000020 */
 #define RCC_CFGR_HPRE_2                      (0x4UL << RCC_CFGR_HPRE_Pos)       /*!< 0x00000040 */
@@ -1344,7 +1349,7 @@ typedef struct
 /*!< PPRE1 configuration */
 #define RCC_CFGR_PPRE1_Pos                   (8U)
 #define RCC_CFGR_PPRE1_Msk                   (0x7UL << RCC_CFGR_PPRE1_Pos)      /*!< 0x00000700 */
-#define RCC_CFGR_PPRE1                       RCC_CFGR_PPRE1_Msk                /*!< PRE1[2:0] bits (APB1 prescaler) */
+#define RCC_CFGR_PPRE1                       RCC_CFGR_PPRE1_Msk                 /*!< PRE1[2:0] bits (APB1 prescaler) */
 #define RCC_CFGR_PPRE1_0                     (0x1UL << RCC_CFGR_PPRE1_Pos)      /*!< 0x00000100 */
 #define RCC_CFGR_PPRE1_1                     (0x2UL << RCC_CFGR_PPRE1_Pos)      /*!< 0x00000200 */
 #define RCC_CFGR_PPRE1_2                     (0x4UL << RCC_CFGR_PPRE1_Pos)      /*!< 0x00000400 */
@@ -1358,7 +1363,7 @@ typedef struct
 /*!< PPRE2 configuration */
 #define RCC_CFGR_PPRE2_Pos                   (11U)
 #define RCC_CFGR_PPRE2_Msk                   (0x7UL << RCC_CFGR_PPRE2_Pos)      /*!< 0x00003800 */
-#define RCC_CFGR_PPRE2                       RCC_CFGR_PPRE2_Msk                /*!< PRE2[2:0] bits (APB2 prescaler) */
+#define RCC_CFGR_PPRE2                       RCC_CFGR_PPRE2_Msk                 /*!< PRE2[2:0] bits (APB2 prescaler) */
 #define RCC_CFGR_PPRE2_0                     (0x1UL << RCC_CFGR_PPRE2_Pos)      /*!< 0x00000800 */
 #define RCC_CFGR_PPRE2_1                     (0x2UL << RCC_CFGR_PPRE2_Pos)      /*!< 0x00001000 */
 #define RCC_CFGR_PPRE2_2                     (0x4UL << RCC_CFGR_PPRE2_Pos)      /*!< 0x00002000 */
@@ -1372,7 +1377,7 @@ typedef struct
 /*!< ADCPPRE configuration */
 #define RCC_CFGR_ADCPRE_Pos                  (14U)
 #define RCC_CFGR_ADCPRE_Msk                  (0x3UL << RCC_CFGR_ADCPRE_Pos)     /*!< 0x0000C000 */
-#define RCC_CFGR_ADCPRE                      RCC_CFGR_ADCPRE_Msk               /*!< ADCPRE[1:0] bits (ADC prescaler) */
+#define RCC_CFGR_ADCPRE                      RCC_CFGR_ADCPRE_Msk                /*!< ADCPRE[1:0] bits (ADC prescaler) */
 #define RCC_CFGR_ADCPRE_0                    (0x1UL << RCC_CFGR_ADCPRE_Pos)     /*!< 0x00004000 */
 #define RCC_CFGR_ADCPRE_1                    (0x2UL << RCC_CFGR_ADCPRE_Pos)     /*!< 0x00008000 */
 
@@ -1383,16 +1388,16 @@ typedef struct
 
 #define RCC_CFGR_PLLSRC_Pos                  (16U)
 #define RCC_CFGR_PLLSRC_Msk                  (0x1UL << RCC_CFGR_PLLSRC_Pos)     /*!< 0x00010000 */
-#define RCC_CFGR_PLLSRC                      RCC_CFGR_PLLSRC_Msk               /*!< PLL entry clock source */
+#define RCC_CFGR_PLLSRC                      RCC_CFGR_PLLSRC_Msk                /*!< PLL entry clock source */
 
 #define RCC_CFGR_PLLXTPRE_Pos                (17U)
 #define RCC_CFGR_PLLXTPRE_Msk                (0x1UL << RCC_CFGR_PLLXTPRE_Pos)   /*!< 0x00020000 */
-#define RCC_CFGR_PLLXTPRE                    RCC_CFGR_PLLXTPRE_Msk             /*!< HSE divider for PLL entry */
+#define RCC_CFGR_PLLXTPRE                    RCC_CFGR_PLLXTPRE_Msk              /*!< HSE divider for PLL entry */
 
 /*!< PLLMUL configuration */
 #define RCC_CFGR_PLLMULL_Pos                 (18U)
 #define RCC_CFGR_PLLMULL_Msk                 (0xFUL << RCC_CFGR_PLLMULL_Pos)    /*!< 0x003C0000 */
-#define RCC_CFGR_PLLMULL                     RCC_CFGR_PLLMULL_Msk              /*!< PLLMUL[3:0] bits (PLL multiplication factor) */
+#define RCC_CFGR_PLLMULL                     RCC_CFGR_PLLMULL_Msk               /*!< PLLMUL[3:0] bits (PLL multiplication factor) */
 #define RCC_CFGR_PLLMULL_0                   (0x1UL << RCC_CFGR_PLLMULL_Pos)    /*!< 0x00040000 */
 #define RCC_CFGR_PLLMULL_1                   (0x2UL << RCC_CFGR_PLLMULL_Pos)    /*!< 0x00080000 */
 #define RCC_CFGR_PLLMULL_2                   (0x4UL << RCC_CFGR_PLLMULL_Pos)    /*!< 0x00100000 */
@@ -1404,54 +1409,54 @@ typedef struct
 #define RCC_CFGR_PLLMULL2                    0x00000000U                       /*!< PLL input clock*2 */
 #define RCC_CFGR_PLLMULL3_Pos                (18U)
 #define RCC_CFGR_PLLMULL3_Msk                (0x1UL << RCC_CFGR_PLLMULL3_Pos)   /*!< 0x00040000 */
-#define RCC_CFGR_PLLMULL3                    RCC_CFGR_PLLMULL3_Msk             /*!< PLL input clock*3 */
+#define RCC_CFGR_PLLMULL3                    RCC_CFGR_PLLMULL3_Msk              /*!< PLL input clock*3 */
 #define RCC_CFGR_PLLMULL4_Pos                (19U)
 #define RCC_CFGR_PLLMULL4_Msk                (0x1UL << RCC_CFGR_PLLMULL4_Pos)   /*!< 0x00080000 */
-#define RCC_CFGR_PLLMULL4                    RCC_CFGR_PLLMULL4_Msk             /*!< PLL input clock*4 */
+#define RCC_CFGR_PLLMULL4                    RCC_CFGR_PLLMULL4_Msk              /*!< PLL input clock*4 */
 #define RCC_CFGR_PLLMULL5_Pos                (18U)
 #define RCC_CFGR_PLLMULL5_Msk                (0x3UL << RCC_CFGR_PLLMULL5_Pos)   /*!< 0x000C0000 */
-#define RCC_CFGR_PLLMULL5                    RCC_CFGR_PLLMULL5_Msk             /*!< PLL input clock*5 */
+#define RCC_CFGR_PLLMULL5                    RCC_CFGR_PLLMULL5_Msk              /*!< PLL input clock*5 */
 #define RCC_CFGR_PLLMULL6_Pos                (20U)
 #define RCC_CFGR_PLLMULL6_Msk                (0x1UL << RCC_CFGR_PLLMULL6_Pos)   /*!< 0x00100000 */
-#define RCC_CFGR_PLLMULL6                    RCC_CFGR_PLLMULL6_Msk             /*!< PLL input clock*6 */
+#define RCC_CFGR_PLLMULL6                    RCC_CFGR_PLLMULL6_Msk              /*!< PLL input clock*6 */
 #define RCC_CFGR_PLLMULL7_Pos                (18U)
 #define RCC_CFGR_PLLMULL7_Msk                (0x5UL << RCC_CFGR_PLLMULL7_Pos)   /*!< 0x00140000 */
-#define RCC_CFGR_PLLMULL7                    RCC_CFGR_PLLMULL7_Msk             /*!< PLL input clock*7 */
+#define RCC_CFGR_PLLMULL7                    RCC_CFGR_PLLMULL7_Msk              /*!< PLL input clock*7 */
 #define RCC_CFGR_PLLMULL8_Pos                (19U)
 #define RCC_CFGR_PLLMULL8_Msk                (0x3UL << RCC_CFGR_PLLMULL8_Pos)   /*!< 0x00180000 */
-#define RCC_CFGR_PLLMULL8                    RCC_CFGR_PLLMULL8_Msk             /*!< PLL input clock*8 */
+#define RCC_CFGR_PLLMULL8                    RCC_CFGR_PLLMULL8_Msk              /*!< PLL input clock*8 */
 #define RCC_CFGR_PLLMULL9_Pos                (18U)
 #define RCC_CFGR_PLLMULL9_Msk                (0x7UL << RCC_CFGR_PLLMULL9_Pos)   /*!< 0x001C0000 */
-#define RCC_CFGR_PLLMULL9                    RCC_CFGR_PLLMULL9_Msk             /*!< PLL input clock*9 */
+#define RCC_CFGR_PLLMULL9                    RCC_CFGR_PLLMULL9_Msk              /*!< PLL input clock*9 */
 #define RCC_CFGR_PLLMULL10_Pos               (21U)
 #define RCC_CFGR_PLLMULL10_Msk               (0x1UL << RCC_CFGR_PLLMULL10_Pos)  /*!< 0x00200000 */
-#define RCC_CFGR_PLLMULL10                   RCC_CFGR_PLLMULL10_Msk            /*!< PLL input clock10 */
+#define RCC_CFGR_PLLMULL10                   RCC_CFGR_PLLMULL10_Msk             /*!< PLL input clock10 */
 #define RCC_CFGR_PLLMULL11_Pos               (18U)
 #define RCC_CFGR_PLLMULL11_Msk               (0x9UL << RCC_CFGR_PLLMULL11_Pos)  /*!< 0x00240000 */
-#define RCC_CFGR_PLLMULL11                   RCC_CFGR_PLLMULL11_Msk            /*!< PLL input clock*11 */
+#define RCC_CFGR_PLLMULL11                   RCC_CFGR_PLLMULL11_Msk             /*!< PLL input clock*11 */
 #define RCC_CFGR_PLLMULL12_Pos               (19U)
 #define RCC_CFGR_PLLMULL12_Msk               (0x5UL << RCC_CFGR_PLLMULL12_Pos)  /*!< 0x00280000 */
-#define RCC_CFGR_PLLMULL12                   RCC_CFGR_PLLMULL12_Msk            /*!< PLL input clock*12 */
+#define RCC_CFGR_PLLMULL12                   RCC_CFGR_PLLMULL12_Msk             /*!< PLL input clock*12 */
 #define RCC_CFGR_PLLMULL13_Pos               (18U)
 #define RCC_CFGR_PLLMULL13_Msk               (0xBUL << RCC_CFGR_PLLMULL13_Pos)  /*!< 0x002C0000 */
-#define RCC_CFGR_PLLMULL13                   RCC_CFGR_PLLMULL13_Msk            /*!< PLL input clock*13 */
+#define RCC_CFGR_PLLMULL13                   RCC_CFGR_PLLMULL13_Msk             /*!< PLL input clock*13 */
 #define RCC_CFGR_PLLMULL14_Pos               (20U)
 #define RCC_CFGR_PLLMULL14_Msk               (0x3UL << RCC_CFGR_PLLMULL14_Pos)  /*!< 0x00300000 */
-#define RCC_CFGR_PLLMULL14                   RCC_CFGR_PLLMULL14_Msk            /*!< PLL input clock*14 */
+#define RCC_CFGR_PLLMULL14                   RCC_CFGR_PLLMULL14_Msk             /*!< PLL input clock*14 */
 #define RCC_CFGR_PLLMULL15_Pos               (18U)
 #define RCC_CFGR_PLLMULL15_Msk               (0xDUL << RCC_CFGR_PLLMULL15_Pos)  /*!< 0x00340000 */
-#define RCC_CFGR_PLLMULL15                   RCC_CFGR_PLLMULL15_Msk            /*!< PLL input clock*15 */
+#define RCC_CFGR_PLLMULL15                   RCC_CFGR_PLLMULL15_Msk             /*!< PLL input clock*15 */
 #define RCC_CFGR_PLLMULL16_Pos               (19U)
 #define RCC_CFGR_PLLMULL16_Msk               (0x7UL << RCC_CFGR_PLLMULL16_Pos)  /*!< 0x00380000 */
-#define RCC_CFGR_PLLMULL16                   RCC_CFGR_PLLMULL16_Msk            /*!< PLL input clock*16 */
+#define RCC_CFGR_PLLMULL16                   RCC_CFGR_PLLMULL16_Msk             /*!< PLL input clock*16 */
 #define RCC_CFGR_USBPRE_Pos                  (22U)
 #define RCC_CFGR_USBPRE_Msk                  (0x1UL << RCC_CFGR_USBPRE_Pos)     /*!< 0x00400000 */
-#define RCC_CFGR_USBPRE                      RCC_CFGR_USBPRE_Msk               /*!< USB Device prescaler */
+#define RCC_CFGR_USBPRE                      RCC_CFGR_USBPRE_Msk                /*!< USB Device prescaler */
 
 /*!< MCO configuration */
 #define RCC_CFGR_MCO_Pos                     (24U)
 #define RCC_CFGR_MCO_Msk                     (0x7UL << RCC_CFGR_MCO_Pos)        /*!< 0x07000000 */
-#define RCC_CFGR_MCO                         RCC_CFGR_MCO_Msk                  /*!< MCO[2:0] bits (Microcontroller Clock Output) */
+#define RCC_CFGR_MCO                         RCC_CFGR_MCO_Msk                   /*!< MCO[2:0] bits (Microcontroller Clock Output) */
 #define RCC_CFGR_MCO_0                       (0x1UL << RCC_CFGR_MCO_Pos)        /*!< 0x01000000 */
 #define RCC_CFGR_MCO_1                       (0x2UL << RCC_CFGR_MCO_Pos)        /*!< 0x02000000 */
 #define RCC_CFGR_MCO_2                       (0x4UL << RCC_CFGR_MCO_Pos)        /*!< 0x04000000 */
