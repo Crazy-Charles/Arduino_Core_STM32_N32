@@ -1,6 +1,6 @@
 {
   "name": "framework-arduinoststm32",
-  "version": "1.10000.250207",
+  "version": "1.20000.250215",
   "description": "Arduino Wiring-based Framework for N32 microcontroller",
   "keywords": [
     "framework",

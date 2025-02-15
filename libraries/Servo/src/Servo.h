@@ -69,6 +69,8 @@
   #include "stm32f4/ServoTimers.h"
 #elif defined(ARDUINO_ARCH_NRF52)
   #include "nrf52/ServoTimers.h"
+#elif defined(ARDUINO_ARCH_N32)
+  #include "stm32/ServoTimers.h"
 #elif defined(ARDUINO_ARCH_STM32)
   #include "stm32/ServoTimers.h"
 #else
