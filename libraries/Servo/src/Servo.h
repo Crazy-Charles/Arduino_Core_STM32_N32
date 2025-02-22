@@ -59,23 +59,8 @@
  */
 
 // Architecture specific include
-#if defined(ARDUINO_ARCH_AVR)
-  #include "avr/ServoTimers.h"
-#elif defined(ARDUINO_ARCH_SAM)
-  #include "sam/ServoTimers.h"
-#elif defined(ARDUINO_ARCH_SAMD)
-  #include "samd/ServoTimers.h"
-#elif defined(ARDUINO_ARCH_STM32F4)
-  #include "stm32f4/ServoTimers.h"
-#elif defined(ARDUINO_ARCH_NRF52)
-  #include "nrf52/ServoTimers.h"
-#elif defined(ARDUINO_ARCH_N32)
-  #include "stm32/ServoTimers.h"
-#elif defined(ARDUINO_ARCH_STM32)
-  #include "stm32/ServoTimers.h"
-#else
-  #error "This library only supports boards with an AVR, SAM, SAMD, NRF52, STM32F4 or STM32 processor."
-#endif
+#include "N32G45x/ServoTimers.h"
+
 
 #define Servo_VERSION           2     // software version of this library
 
@@ -88,8 +73,6 @@
 #define MAX_SERVOS   (_Nbr_16timers  * SERVOS_PER_TIMER)
 
 #define INVALID_SERVO         255     // flag indicating an invalid servo index
-
-#if !defined(ARDUINO_ARCH_STM32F4)
 
 typedef struct  {
   uint8_t nbr;            // a pin number from 0 to 255
@@ -118,5 +101,5 @@ class Servo {
     int8_t max;                       // maximum is this value times 4 added to MAX_PULSE_WIDTH
 };
 
-#endif
+
 #endif

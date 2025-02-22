@@ -12,17 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""
-Arduino
-
-Arduino Wiring-based Framework allows writing cross-platform software to
-control devices attached to a wide range of Arduino boards to create all
-kinds of creative coding, interactive objects, spaces or physical experiences.
-
-https://github.com/stm32duino/Arduino_Core_STM32
-"""
-
-
 from os.path import isfile, isdir, join
 
 from SCons.Script import DefaultEnvironment
@@ -31,7 +20,7 @@ env = DefaultEnvironment()
 platform = env.PioPlatform()
 board = env.BoardConfig()
 
-FRAMEWORK_DIR = platform.get_package_dir("framework-arduinoststm32")
+FRAMEWORK_DIR = platform.get_package_dir("framework-arduino-n32g45x")
 CMSIS_DIR = join(platform.get_package_dir("framework-cmsis"), "CMSIS")
 assert isdir(FRAMEWORK_DIR)
 assert isdir(CMSIS_DIR)
@@ -90,14 +79,14 @@ def process_usb_configuration(cpp_defines):
         env.Append(CPPDEFINES=["HAL_PCD_MODULE_ENABLED"])
 
 
-def get_arm_math_lib(cpu):
-    core = board.get("build.cpu")[7:9]
-    if core == "m4":
-        return "arm_cortexM4lf_math"
-    elif core == "m7":
-        return "arm_cortexM7lfsp_math"
+# def get_arm_math_lib(cpu):
+#     core = board.get("build.cpu")[7:9]
+#     if core == "m4":
+#         return "arm_cortexM4lf_math"
+#     elif core == "m7":
+#         return "arm_cortexM7lfsp_math"
 
-    return "arm_cortex%sl_math" % core.upper()
+#     return "arm_cortex%sl_math" % core.upper()
 
 
 def configure_application_offset(mcu, upload_protocol):
@@ -128,11 +117,11 @@ def configure_application_offset(mcu, upload_protocol):
     env.Append(LINKFLAGS=["-Wl,--defsym=LD_FLASH_OFFSET=%s" % hex(offset)])
 
 
-if any(mcu in board.get("build.cpu") for mcu in ("cortex-m4", "cortex-m7")):
-    env.Append(
-        CCFLAGS=["-mfpu=fpv4-sp-d16", "-mfloat-abi=hard"],
-        LINKFLAGS=["-mfpu=fpv4-sp-d16", "-mfloat-abi=hard"],
-    )
+# if any(mcu in board.get("build.cpu") for mcu in ("cortex-m4", "cortex-m7")):
+#     env.Append(
+#         CCFLAGS=["-mfpu=fpv4-sp-d16", "-mfloat-abi=hard"],
+#         LINKFLAGS=["-mfpu=fpv4-sp-d16", "-mfloat-abi=hard"],
+#     )
 
 env.Append(
     ASFLAGS=["-x", "assembler-with-cpp"],
@@ -154,26 +143,28 @@ env.Append(
         "-nostdlib",
         "--param",
         "max-inline-insns-single=500",
+        "-mfpu=fpv4-sp-d16",
+        "-mfloat-abi=hard",
     ],
     CPPDEFINES=[
         series,
         ("ARDUINO", 10808),
-        "ARDUINO_ARCH_STM32",
+        "ARDUINO_ARCH_N32",
         "ARDUINO_%s" % board_name.upper(),
         ("BOARD_NAME", '\\"%s\\"' % board_name.upper()),
         "HAL_UART_MODULE_ENABLED",
     ],
     CPPPATH=[
         join(FRAMEWORK_DIR, "cores", "arduino", "avr"),
-        join(FRAMEWORK_DIR, "cores", "arduino", "stm32"),
-        join(FRAMEWORK_DIR, "cores", "arduino", "stm32", "LL"),
-        join(FRAMEWORK_DIR, "cores", "arduino", "stm32", "usb"),
-        join(FRAMEWORK_DIR, "cores", "arduino", "stm32", "OpenAMP"),
-        join(FRAMEWORK_DIR, "cores", "arduino", "stm32", "usb", "hid"),
-        join(FRAMEWORK_DIR, "cores", "arduino", "stm32", "usb", "cdc"),
-        join(FRAMEWORK_DIR, "system", "Drivers", series + "_HAL_Driver", "Inc"),
-        join(FRAMEWORK_DIR, "system", "Drivers", series + "_HAL_Driver", "Src"),
-        join(FRAMEWORK_DIR, "system", series),
+        join(FRAMEWORK_DIR, "cores", "arduino", "N32G45x"),
+        join(FRAMEWORK_DIR, "cores", "arduino", "N32G45x", "LL"),
+        join(FRAMEWORK_DIR, "cores", "arduino", "N32G45x", "usb"),
+        join(FRAMEWORK_DIR, "cores", "arduino", "N32G45x", "OpenAMP"),
+        join(FRAMEWORK_DIR, "cores", "arduino", "N32G45x", "usb", "hid"),
+        join(FRAMEWORK_DIR, "cores", "arduino", "N32G45x", "usb", "cdc"),
+        join(FRAMEWORK_DIR, "system", "Drivers", "N32G45x_HAL_Driver", "Inc"),
+        join(FRAMEWORK_DIR, "system", "Drivers", "N32G45x_HAL_Driver", "Src"),
+        join(FRAMEWORK_DIR, "system", "N32G4xx"),
         join(
             FRAMEWORK_DIR,
             "system",
@@ -230,8 +221,8 @@ env.Append(
             "Drivers",
             "CMSIS",
             "Device",
-            "ST",
-            series,
+            "Nations",
+            "N32G45x",
             "Include",
         ),
         join(
@@ -240,8 +231,8 @@ env.Append(
             "Drivers",
             "CMSIS",
             "Device",
-            "ST",
-            series,
+            "Nations",
+            "N32G45x",
             "Source",
             "Templates",
             "gcc",
@@ -262,9 +253,11 @@ env.Append(
         "-Wl,--warn-common",
         "-Wl,--defsym=LD_MAX_SIZE=%d" % board.get("upload.maximum_size"),
         "-Wl,--defsym=LD_MAX_DATA_SIZE=%d" % board.get("upload.maximum_ram_size"),
+        "-mfpu=fpv4-sp-d16", 
+        "-mfloat-abi=hard",
     ],
     LIBS=[
-        get_arm_math_lib(env.BoardConfig().get("build.cpu")),
+        "arm_cortexM4lf_math",
         "c",
         "m",
         "gcc",
@@ -272,18 +265,6 @@ env.Append(
     ],
     LIBPATH=[variant_dir, join(CMSIS_DIR, "DSP", "Lib", "GCC")],
 )
-
-if "build.usb_product" in board:
-    env.Append(
-        CPPDEFINES=[
-            ("USB_VID", board.get("build.hwids")[0][0]),
-            ("USB_PID", board.get("build.hwids")[0][1]),
-            ("USB_PRODUCT", '\\"%s\\"' %
-             board.get("build.usb_product", "").replace('"', "")),
-            ("USB_MANUFACTURER", '\\"%s\\"' %
-             board.get("vendor", "").replace('"', ""))
-        ]
-    )
 
 env.ProcessFlags(board.get("build.framework_extra_flags.arduino", ""))
 
@@ -315,7 +296,7 @@ env.Append(ASFLAGS=env.get("CCFLAGS", [])[:])
 
 env.Append(
     LIBSOURCE_DIRS=[
-        join(FRAMEWORK_DIR, "libraries", "__cores__", "arduino"),
+        # join(FRAMEWORK_DIR, "libraries", "__cores__", "arduino"),
         join(FRAMEWORK_DIR, "libraries"),
     ]
 )

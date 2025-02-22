@@ -16,8 +16,6 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 */
 
-#if defined(ARDUINO_ARCH_STM32)
-
 #include <Arduino.h>
 #include <Servo.h>
 #include <HardwareTimer.h>
@@ -199,6 +197,7 @@ bool Servo::attached()
 #else
 
 #warning "TIMER_TONE or HAL_TIM_MODULE_ENABLED not defined"
+
 Servo::Servo() {}
 uint8_t Servo::attach(int pin)
 {
@@ -233,4 +232,3 @@ bool Servo::attached() {}
 
 #endif /* HAL_TIM_MODULE_ENABLED && TIMER_SERVO & !HAL_TIM_MODULE_ONLY */
 
-#endif // ARDUINO_ARCH_STM32
