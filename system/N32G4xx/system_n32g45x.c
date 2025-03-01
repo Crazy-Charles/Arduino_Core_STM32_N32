@@ -32,7 +32,9 @@
  *
  * @copyright Copyright (c) 2019, Nations Technologies Inc. All rights reserved.
  */
-#include "n32g45x.h"
+//#include "n32g45x.h"
+#include "stm32f1xx.h"
+#include <stdbool.h>
 
 /* Uncomment the line corresponding to the desired System clock (SYSCLK)
    frequency (after reset the HSI is used as SYSCLK source)

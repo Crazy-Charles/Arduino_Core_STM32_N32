@@ -683,13 +683,12 @@ void HardwareTimer::setMode(uint32_t channel, TimerModes_t mode, PinName pin)
     if ((int)get_pwm_channel(pin) == timChannel) {
       /* Configure PWM GPIO pins */
       pinmap_pinout(pin, PinMap_PWM);
-#if defined(STM32F1xx)
       if ((mode == TIMER_INPUT_CAPTURE_RISING) || (mode == TIMER_INPUT_CAPTURE_FALLING) \
           || (mode == TIMER_INPUT_CAPTURE_BOTHEDGE) || (mode == TIMER_INPUT_FREQ_DUTY_MEASUREMENT)) {
         // on F1 family, input alternate function must configure GPIO in input mode
         pinMode(pinNametoDigitalPin(pin), INPUT);
       }
-#endif
+
     } else {
       // Pin doesn't match with timer output channels
       Error_Handler();
@@ -1418,21 +1417,16 @@ extern "C" {
       HAL_TIM_IRQHandler(&HardwareTimer_Handle[TIMER1_INDEX]->handle);
     }
 
-#if defined(STM32F1xx) || defined(STM32F2xx) || defined(STM32F4xx) || defined(STM32F7xx)
 #if defined (TIM10_BASE)
     if (HardwareTimer_Handle[TIMER10_INDEX]) {
       HAL_TIM_IRQHandler(&HardwareTimer_Handle[TIMER10_INDEX]->handle);
     }
 #endif
-#endif
 
-#if defined(STM32F1xx) || defined(STM32F3xx) || defined(STM32G4xx) || defined(STM32L4xx) || \
-    defined(STM32WBxx)
 #if defined (TIM16_BASE)
     if (HardwareTimer_Handle[TIMER16_INDEX]) {
       HAL_TIM_IRQHandler(&HardwareTimer_Handle[TIMER16_INDEX]->handle);
     }
-#endif
 #endif
   }
 
@@ -1542,13 +1536,13 @@ extern "C" {
       HAL_TIM_IRQHandler(&HardwareTimer_Handle[TIMER8_INDEX]->handle);
     }
 
-#if defined(STM32F1xx) || defined(STM32F2xx) ||defined(STM32F4xx) || defined(STM32F7xx) || defined(STM32H7xx)
+
 #if defined(TIMER13_BASE)
     if (HardwareTimer_Handle[TIMER13_INDEX]) {
       HAL_TIM_IRQHandler(&HardwareTimer_Handle[TIMER13_INDEX]->handle);
     }
 #endif // TIMER13_BASE
-#endif
+
   }
 
   void TIM8_CC_IRQHandler(void)

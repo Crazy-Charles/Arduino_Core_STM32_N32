@@ -40,7 +40,7 @@ extern "C" {
 #if defined(STM32F0xx) || defined(STM32G0xx)
 #define TIM1_IRQn TIM1_BRK_UP_TRG_COM_IRQn
 #define TIM1_IRQHandler TIM1_BRK_UP_TRG_COM_IRQHandler
-#elif defined(STM32F1xx) ||defined(STM32G4xx)
+#elif defined(STM32F1xx) || defined(STM32G4xx)
 #define TIM1_IRQn TIM1_UP_TIM16_IRQn
 #if !defined (TIM10_BASE)
 #define TIM1_IRQHandler TIM1_UP_TIM16_IRQHandler

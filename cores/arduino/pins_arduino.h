@@ -298,25 +298,15 @@ PinName analogInputToPinName(uint32_t pin);
 #define portInputRegister(P)        (&(P->IDR))
 
 #define portSetRegister(P)          (&(P->BSRR))
-#if defined(STM32F2xx) || defined(STM32F4xx) || defined(STM32F7xx)
-// For those series reset are in the high part so << 16U needed
-#define portClearRegister(P)        (&(P->BSRR))
-#else
 #define portClearRegister(P)        (&(P->BRR))
-#endif
 
-
-#if defined(STM32F1xx)
 // Config registers split in 2 registers:
 // CRL: pin 0..7
 // CRH: pin 8..15
 // Return only CRL
 #define portModeRegister(P)         (&(P->CRL))
-#else
-#define portModeRegister(P)         (&(P->MODER))
-#endif
-#define portConfigRegister(P)       (portModeRegister(P))
 
+#define portConfigRegister(P)       (portModeRegister(P))
 
 #define digitalPinIsValid(p)        (digitalPinToPinName(p) != NC)
 

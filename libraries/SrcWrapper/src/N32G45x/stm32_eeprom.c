@@ -40,13 +40,8 @@ extern "C" {
 #endif
 
 /* Be able to change FLASH_BANK_NUMBER to use if relevant */
-#if !defined(FLASH_BANK_NUMBER) &&\
-    (defined(STM32F0xx) || defined(STM32F1xx) || defined(STM32G4xx) ||\
-     defined(STM32H7xx) || defined(STM32L1xx) || defined(STM32L4xx))
+#if !defined(FLASH_BANK_NUMBER)
 /* Fo STM32F0xx, FLASH_BANK_1 is not defined only FLASH_BANK1_END is defined */
-#if defined(STM32F0xx)
-#define FLASH_BANK_1 1U
-#endif
 #if defined(FLASH_BANK_2)
 #define FLASH_BANK_NUMBER   FLASH_BANK_2
 #else
@@ -56,25 +51,6 @@ extern "C" {
 #error "FLASH_BANK_NUMBER could not be defined"
 #endif
 #endif /* !FLASH_BANK_NUMBER */
-
-/* Be able to change FLASH_DATA_SECTOR to use if relevant */
-#if defined(STM32F2xx) || defined(STM32F4xx) || defined(STM32F7xx)  ||\
-    defined(STM32H7xx)
-#if !defined(FLASH_DATA_SECTOR)
-#define FLASH_DATA_SECTOR   ((uint32_t)(FLASH_SECTOR_TOTAL - 1))
-#else
-#ifndef FLASH_BASE_ADDRESS
-#error "FLASH_BASE_ADDRESS have to be defined when FLASH_DATA_SECTOR is defined"
-#endif
-#endif /* !FLASH_DATA_SECTOR */
-#endif /* STM32F2xx || STM32F4xx || STM32F7xx */
-
-/* Be able to change FLASH_PAGE_NUMBER to use if relevant */
-#if !defined(FLASH_PAGE_NUMBER) &&\
-    (defined (STM32G0xx) || defined(STM32G4xx) || defined (STM32L4xx) ||\
-     defined(STM32WBxx))
-#define FLASH_PAGE_NUMBER   ((uint32_t)((FLASH_SIZE / FLASH_PAGE_SIZE) - 1))
-#endif /* !FLASH_PAGE_NUMBER */
 
 /* Be able to change FLASH_END to use */
 #if !defined(FLASH_END) && !defined(STM32L0xx)

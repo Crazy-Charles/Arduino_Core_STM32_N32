@@ -32,9 +32,8 @@
 #define _PERIPHERALPINS_H
 
 #include "pinmap.h"
-#ifdef STM32F1xx
-  #include "PinAF_STM32F1.h"
-#endif
+#include "PinAF_STM32F1.h"
+
 
 //*** ADC ***
 extern const PinMap PinMap_ADC[];

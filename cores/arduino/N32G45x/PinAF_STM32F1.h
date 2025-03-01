@@ -31,8 +31,6 @@
 #ifndef _PINAF_STM32F1_H
 #define _PINAF_STM32F1_H
 
-#ifdef STM32F1xx
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -510,7 +508,5 @@ static inline void pin_SetF1AFPin(uint32_t afnum)
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* STM32F1xx */
 
 #endif /* _PINAF_STM32F1_H */

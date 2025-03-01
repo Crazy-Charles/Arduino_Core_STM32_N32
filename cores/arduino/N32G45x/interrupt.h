@@ -44,10 +44,6 @@
 
 #if !defined(HAL_EXTI_MODULE_DISABLED)
 
-  #if defined(STM32F3xx)
-    #define EXTI2_IRQn    EXTI2_TSC_IRQn
-  #endif
-
   #ifndef EXTI_IRQ_PRIO
     #if (__CORTEX_M == 0x00U)
       #define EXTI_IRQ_PRIO       3

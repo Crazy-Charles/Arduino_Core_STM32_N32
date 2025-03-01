@@ -45,9 +45,9 @@
   * @{
   */
 /**
-  * @brief Configuration of the Cortex-M3 Processor and Core Peripherals
+  * @brief Configuration of the Cortex-M4 Processor and Core Peripherals
  */
-#define __CM3_REV                  0x0200U  /*!< Core Revision r2p0                           */
+#define __CM4_REV                  0x0001U  /*!< Core revision r0p1                           */
 #define __FPU_PRESENT              1U       /*!< FPU present                                  */
 #define __FPU_USED                 1U
 #define __MPU_PRESENT              0U       /*!< Other STM32 devices does not provide an MPU  */
@@ -139,7 +139,7 @@ typedef enum IRQn
     DMA2_Channel1_IRQn   = 56, /*!< DMA2 Channel 1 global Interrupt                      */
     DMA2_Channel2_IRQn   = 57, /*!< DMA2 Channel 2 global Interrupt                      */
     DMA2_Channel3_IRQn   = 58, /*!< DMA2 Channel 3 global Interrupt                      */
-    DMA2_Channel4_5_IRQn   = 59, /*!< DMA2 Channel 4 global Interrupt                      */
+    DMA2_Channel4_IRQn   = 59, /*!< DMA2 Channel 4 global Interrupt                      */
     DMA2_Channel5_IRQn   = 60, /*!< DMA2 Channel 5 global Interrupt                      */
     ETH_IRQn             = 61, /*!< Ethernet global Interrupt                            */
     ETH_WKUP_IRQn        = 62, /*!< Ethernet Wakeup through EXTI Line interrupt          */
@@ -174,6 +174,7 @@ typedef enum IRQn
 
 #include "core_cm4.h"
 #include "system_stm32f1xx.h"
+//#include "system_n32g45x.h"
 #include <stdint.h>
 
 /** @addtogroup Peripheral_registers_structures
@@ -11723,7 +11724,7 @@ typedef struct
 
 /* Aliases for __IRQn */
 #define ADC1_IRQn               ADC1_2_IRQn
-#define DMA2_Channel4_IRQn      DMA2_Channel4_5_IRQn
+#define DMA2_Channel4_IRQn      DMA2_Channel4_IRQn
 #define TIM9_IRQn               TIM1_BRK_IRQn
 #define TIM1_BRK_TIM9_IRQn      TIM1_BRK_IRQn
 #define TIM1_BRK_TIM15_IRQn     TIM1_BRK_IRQn
@@ -11750,7 +11751,7 @@ typedef struct
 
 /* Aliases for __IRQHandler */
 #define ADC1_IRQHandler               ADC1_2_IRQHandler
-#define DMA2_Channel4_IRQHandler      DMA2_Channel4_5_IRQHandler
+#define DMA2_Channel4_IRQHandler      DMA2_Channel4_IRQHandler
 #define TIM9_IRQHandler               TIM1_BRK_IRQHandler
 #define TIM1_BRK_TIM9_IRQHandler      TIM1_BRK_IRQHandler
 #define TIM1_BRK_TIM15_IRQHandler     TIM1_BRK_IRQHandler

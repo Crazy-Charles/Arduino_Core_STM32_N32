@@ -49,9 +49,8 @@ void attachInterrupt(uint32_t pin, callback_function_t callback, uint32_t mode)
       break;
   }
 
-#ifdef STM32F1xx
   pinF1_DisconnectDebug(p);
-#endif /* STM32F1xx */
+
 
   stm32_interrupt_enable(port, STM_GPIO_PIN(p), callback, it_mode);
 #else
