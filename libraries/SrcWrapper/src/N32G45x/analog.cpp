@@ -38,7 +38,7 @@
 #include "stm32_def.h"
 #include "analog.h"
 #include "PinAF_STM32F1.h"
-#include "stm32yyxx_ll_adc.h"
+#include "stm32f1xx_ll_adc.h"
 
 #ifdef __cplusplus
 extern "C" {

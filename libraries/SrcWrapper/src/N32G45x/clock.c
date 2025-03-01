@@ -37,7 +37,7 @@
   */
 #include "backup.h"
 #include "clock.h"
-#include "stm32yyxx_ll_cortex.h"
+#include "stm32f1xx_ll_cortex.h"
 
 #ifdef __cplusplus
 extern "C" {

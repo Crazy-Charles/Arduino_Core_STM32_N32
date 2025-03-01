@@ -14,7 +14,7 @@
 #include "hw_config.h"
 #include "low_power.h"
 #include "rtc.h"
-#include "stm32_eeprom.h"
+//#include "stm32_eeprom.h"
 #include "timer.h"
 #include "uart.h"
 

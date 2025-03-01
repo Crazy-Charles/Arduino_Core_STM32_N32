@@ -32,11 +32,7 @@
 #define _PINCONFIG_H
 
 #include "PinAF_STM32F1.h"
-#include "stm32yyxx_ll_gpio.h"
-
-#if defined(STM32MP1xx)
-  #include "lock_resource.h"
-#endif
+#include "stm32f1xx_ll_gpio.h"
 
 static inline void pin_DisconnectDebug(PinName pin)
 {

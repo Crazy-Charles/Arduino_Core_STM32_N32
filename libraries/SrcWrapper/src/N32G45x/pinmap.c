@@ -16,12 +16,8 @@
 //Based on mbed-os/hal/mbed_pinmap_common.c
 #include "pinmap.h"
 #include "pinconfig.h"
-#include "stm32yyxx_ll_gpio.h"
-#include "stm32yyxx_ll_system.h"
-
-#if defined(STM32MP1xx)
-  #include "lock_resource.h"
-#endif
+#include "stm32f1xx_ll_gpio.h"
+#include "stm32f1xx_ll_system.h"
 
 /* Map STM_PIN to LL */
 const uint32_t pin_map_ll[16] = {
@@ -98,33 +94,26 @@ void pin_function(PinName pin, int function)
   /* Enable GPIO clock */
   GPIO_TypeDef *gpio = set_GPIO_Port_Clock(port);
 
-#if defined(STM32MP1xx)
-  PERIPH_LOCK(gpio);
-#endif
   /*  Set default speed to high.
    *  For most families there are dedicated registers so it is
    *  not so important, register can be set at any time.
    *  But for families like F1, speed only applies to output.
    */
-#if defined (STM32F1xx)
   if (mode == STM_PIN_OUTPUT) {
-#endif
+
 #ifdef LL_GPIO_SPEED_FREQ_VERY_HIGH
     LL_GPIO_SetPinSpeed(gpio, ll_pin, LL_GPIO_SPEED_FREQ_VERY_HIGH);
 #else
     LL_GPIO_SetPinSpeed(gpio, ll_pin, LL_GPIO_SPEED_FREQ_HIGH);
 #endif
-#if defined (STM32F1xx)
   }
-#endif
+
 
   switch (mode) {
     case STM_PIN_INPUT:
       ll_mode = LL_GPIO_MODE_INPUT;
-#if defined(STM32F1xx)
       // on F1 family, input mode may be associated with an alternate function
       pin_SetAFPin(gpio, pin, afnum);
-#endif
       break;
     case STM_PIN_OUTPUT:
       ll_mode = LL_GPIO_MODE_OUTPUT;

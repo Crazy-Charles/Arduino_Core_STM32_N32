@@ -23,7 +23,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32_def.h"
-#include "stm32yyxx_ll_rtc.h"
+#include "stm32f1xx_ll_rtc.h"
 
 #ifdef __cplusplus
 extern "C" {

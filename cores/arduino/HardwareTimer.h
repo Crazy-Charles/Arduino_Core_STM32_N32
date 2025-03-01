@@ -29,7 +29,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "timer.h"
-#include "stm32yyxx_ll_tim.h"
+#include "stm32f1xx_ll_tim.h"
 
 #if defined(HAL_TIM_MODULE_ENABLED) && !defined(HAL_TIM_MODULE_ONLY)
 

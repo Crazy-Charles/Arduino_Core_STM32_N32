@@ -40,7 +40,7 @@
 #include "wiring_constants.h"
 #include "PinNames.h"
 #include "pinmap.h"
-#include "stm32yyxx_ll_gpio.h"
+#include "stm32f1xx_ll_gpio.h"
 
 #ifdef __cplusplus
 extern "C" {

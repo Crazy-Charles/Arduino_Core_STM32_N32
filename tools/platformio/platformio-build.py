@@ -92,26 +92,26 @@ def process_usb_configuration(cpp_defines):
 def configure_application_offset(mcu, upload_protocol):
     offset = 0
 
-    if upload_protocol == "hid":
-        if mcu.startswith("stm32f1"):
-            offset = 0x800
-        elif mcu.startswith("stm32f4"):
-            offset = 0x4000
+    # if upload_protocol == "hid":
+    #     if mcu.startswith("stm32f1"):
+    #         offset = 0x800
+    #     elif mcu.startswith("stm32f4"):
+    #         offset = 0x4000
 
-        env.Append(CPPDEFINES=["BL_HID"])
+    #     env.Append(CPPDEFINES=["BL_HID"])
 
-    elif upload_protocol == "dfu":
-        # STM32F103 series doesn't have embedded DFU over USB
-        # stm32duino bootloader (v1, v2) is used instead
-        if mcu.startswith("stm32f103"):
-            if board.get("upload.boot_version", 2) == 1:
-                offset = 0x5000
-            else:
-                offset = 0x2000
-            env.Append(CPPDEFINES=["BL_LEGACY_LEAF"])
+    # elif upload_protocol == "dfu":
+    #     # STM32F103 series doesn't have embedded DFU over USB
+    #     # stm32duino bootloader (v1, v2) is used instead
+    #     if mcu.startswith("stm32f103"):
+    #         if board.get("upload.boot_version", 2) == 1:
+    #             offset = 0x5000
+    #         else:
+    #             offset = 0x2000
+    #         env.Append(CPPDEFINES=["BL_LEGACY_LEAF"])
 
-    if offset != 0:
-        env.Append(CPPDEFINES=[("VECT_TAB_OFFSET", "%s" % hex(offset))],)
+    # if offset != 0:
+    #     env.Append(CPPDEFINES=[("VECT_TAB_OFFSET", "%s" % hex(offset))],)
 
     # LD_FLASH_OFFSET is mandatory even if there is no offset
     env.Append(LINKFLAGS=["-Wl,--defsym=LD_FLASH_OFFSET=%s" % hex(offset)])

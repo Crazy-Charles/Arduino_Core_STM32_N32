@@ -40,7 +40,7 @@
 #include "utility/spi_com.h"
 #include "PinAF_STM32F1.h"
 #include "pinconfig.h"
-#include "stm32yyxx_ll_spi.h"
+#include "stm32f1xx_ll_spi.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -56,34 +56,6 @@ uint32_t spi_getClkFreqInst(SPI_TypeDef *spi_inst)
 {
   uint32_t spi_freq = SystemCoreClock;
 
-#if defined(STM32F0xx) || defined(STM32G0xx)
-  UNUSED(spi_inst);
-  /* SPIx source CLK is PCKL1 */
-  spi_freq = HAL_RCC_GetPCLK1Freq();
-#elif defined(STM32MP1xx)
-  /* Get source clock depending on SPI instance */
-  if (spi_inst != NP) {
-    switch ((uint32_t)spi_inst) {
-      case (uint32_t)SPI1:
-        spi_freq = HAL_RCCEx_GetPeriphCLKFreq(RCC_PERIPHCLK_SPI1);
-        break;
-      case (uint32_t)SPI2:
-      case (uint32_t)SPI3:
-        spi_freq = HAL_RCCEx_GetPeriphCLKFreq(RCC_PERIPHCLK_SPI23);
-        break;
-      case (uint32_t)SPI4:
-      case (uint32_t)SPI5:
-        spi_freq = HAL_RCCEx_GetPeriphCLKFreq(RCC_PERIPHCLK_SPI45);
-        break;
-      case (uint32_t)SPI6:
-        spi_freq = HAL_RCCEx_GetPeriphCLKFreq(RCC_PERIPHCLK_SPI6);
-        break;
-      default:
-        core_debug("CLK: SPI instance not set");
-        break;
-    }
-  }
-#else
   if (spi_inst != NP) {
     /* Get source clock depending on SPI instance */
     switch ((uint32_t)spi_inst) {
@@ -122,7 +94,6 @@ uint32_t spi_getClkFreqInst(SPI_TypeDef *spi_inst)
         break;
     }
   }
-#endif
   return spi_freq;
 }
 
@@ -246,11 +217,6 @@ void spi_init(spi_t *obj, uint32_t speed, spi_mode_e mode, uint8_t msb)
   }
 
   handle->Init.TIMode            = SPI_TIMODE_DISABLE;
-#if defined(STM32F0xx) || defined(STM32F3xx) || defined(STM32F7xx) ||\
-    defined(STM32G0xx) || defined(STM32H7xx) || defined(STM32L4xx) ||\
-    defined(STM32WBxx) || defined(STM32MP1xx)
-  handle->Init.NSSPMode          = SPI_NSS_PULSE_DISABLE;
-#endif
 
   /* Configure SPI GPIO pins */
   pinmap_pinout(obj->pin_mosi, PinMap_SPI_MOSI);
@@ -407,28 +373,11 @@ spi_status_e spi_transfer(spi_t *obj, uint8_t *tx_buffer, uint8_t *rx_buffer,
     return Timeout > 0U ? SPI_ERROR : SPI_TIMEOUT;
   }
   tickstart = HAL_GetTick();
-
-#if defined(STM32H7xx) || defined(STM32MP1xx)
-  /* Start transfer */
-  LL_SPI_SetTransferSize(_SPI, size);
-  LL_SPI_Enable(_SPI);
-  LL_SPI_StartMasterTransfer(_SPI);
-#endif
-
   while (size--) {
-#if defined(STM32H7xx) || defined(STM32MP1xx)
-    while (!LL_SPI_IsActiveFlag_TXP(_SPI));
-#else
     while (!LL_SPI_IsActiveFlag_TXE(_SPI));
-#endif
     LL_SPI_TransmitData8(_SPI, *tx_buffer++);
-
     if (!skipReceive) {
-#if defined(STM32H7xx) || defined(STM32MP1xx)
-      while (!LL_SPI_IsActiveFlag_RXP(_SPI));
-#else
       while (!LL_SPI_IsActiveFlag_RXNE(_SPI));
-#endif
       *rx_buffer++ = LL_SPI_ReceiveData8(_SPI);
     }
     if ((Timeout != HAL_MAX_DELAY) && (HAL_GetTick() - tickstart >= Timeout)) {
@@ -436,16 +385,6 @@ spi_status_e spi_transfer(spi_t *obj, uint8_t *tx_buffer, uint8_t *rx_buffer,
       break;
     }
   }
-
-#if defined(STM32H7xx) || defined(STM32MP1xx)
-  /* Close transfer */
-  /* Clear flags */
-  LL_SPI_ClearFlag_EOT(_SPI);
-  LL_SPI_ClearFlag_TXTF(_SPI);
-  /* Disable SPI peripheral */
-  LL_SPI_Disable(_SPI);
-#endif
-
   return ret;
 }
 
