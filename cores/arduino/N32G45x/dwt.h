@@ -21,7 +21,7 @@
 #ifndef _DWT_H_
 #define _DWT_H_
 
-#include "stm32_def.h"
+#include "n32g_def.h"
 #include <stdbool.h>
 
 #ifdef DWT_BASE

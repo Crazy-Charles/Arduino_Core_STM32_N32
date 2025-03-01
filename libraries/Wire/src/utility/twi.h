@@ -41,7 +41,7 @@
 #define __TWI_H__
 
 /* Includes ------------------------------------------------------------------*/
-#include "stm32_def.h"
+#include "n32g_def.h"
 #include "PeripheralPins.h"
 
 #ifdef __cplusplus

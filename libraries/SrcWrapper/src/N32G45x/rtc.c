@@ -39,15 +39,6 @@
 #include "rtc.h"
 
 #if defined(HAL_RTC_MODULE_ENABLED) && !defined(HAL_RTC_MODULE_ONLY)
-#if defined(STM32MP1xx)
-  /**
-  * Currently there is no RTC driver for STM32MP1xx. If RTC is used in the future
-  * the function call HAL_RCCEx_PeriphCLKConfig() shall be done under
-  * if(IS_ENGINEERING_BOOT_MODE()), since clock source selection is done by
-  * First Stage Boot Loader on Cortex-A.
-  */
-  #error "RTC shall not be handled by Arduino in STM32MP1xx."
-#endif /* STM32MP1xx */
 
 #ifdef __cplusplus
 extern "C" {
@@ -62,19 +53,10 @@ static void *callbackUserData = NULL;
 
 static sourceClock_t clkSrc = LSI_CLOCK;
 static uint8_t HSEDiv = 0;
-#if !defined(STM32F1xx)
-/* Custom user values */
-static int8_t userPredivAsync = -1;
-static int16_t userPredivSync = -1;
-#endif /* !STM32F1xx */
-
 static hourFormat_t initFormat = HOUR_FORMAT_12;
 
 /* Private function prototypes -----------------------------------------------*/
 static void RTC_initClock(sourceClock_t source);
-#if !defined(STM32F1xx)
-static void RTC_computePrediv(int8_t *asynch, int16_t *synch);
-#endif /* !STM32F1xx */
 
 /* Exported functions --------------------------------------------------------*/
 
@@ -129,49 +111,10 @@ static void RTC_initClock(sourceClock_t source)
      * the clock supplied to the RTC is less than or equal to 1 MHz
      */
     PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_RTC;
-#if defined(STM32F1xx)
     /* HSE max is 16 MHZ divided by 128 --> 125 KHz */
     PeriphClkInit.RTCClockSelection = RCC_RTCCLKSOURCE_HSE_DIV128;
     HSEDiv = 128;
-#elif defined(STM32F0xx) || defined(STM32F3xx) || defined(STM32G0xx) ||\
-      defined(STM32G4xx) || defined(STM32L4xx) || defined(STM32WBxx)
-    PeriphClkInit.RTCClockSelection = RCC_RTCCLKSOURCE_HSE_DIV32;
-    HSEDiv = 32;
-#elif defined(STM32L0xx) || defined(STM32L1xx)
-    if ((HSE_VALUE / 2) <= HSE_RTC_MAX) {
-      PeriphClkInit.RTCClockSelection = RCC_RTCCLKSOURCE_HSE_DIV2;
-      HSEDiv = 2;
-    } else if ((HSE_VALUE / 4) <= HSE_RTC_MAX) {
-      PeriphClkInit.RTCClockSelection = RCC_RTCCLKSOURCE_HSE_DIV4;
-      HSEDiv = 4;
-    } else if ((HSE_VALUE / 8) <= HSE_RTC_MAX) {
-      PeriphClkInit.RTCClockSelection = RCC_RTCCLKSOURCE_HSE_DIV8;
-      HSEDiv = 8;
-    } else if ((HSE_VALUE / 16) <= HSE_RTC_MAX) {
-      PeriphClkInit.RTCClockSelection = RCC_RTCCLKSOURCE_HSE_DIV16;
-      HSEDiv = 16;
-    }
-#elif defined(STM32F2xx) || defined(STM32F4xx) || defined(STM32F7xx) || defined(STM32H7xx)
-    /* Not defined for STM32F2xx */
-#ifndef RCC_RTCCLKSOURCE_HSE_DIVX
-#define RCC_RTCCLKSOURCE_HSE_DIVX 0x00000300U
-#endif /* RCC_RTCCLKSOURCE_HSE_DIVX */
-#if defined(STM32H7xx)
-#define HSEDIV_MAX 64
-#define HSESHIFT 12
-#else
-#define HSEDIV_MAX 32
-#define HSESHIFT 16
-#endif
-    for (HSEDiv = 2; HSEDiv < HSEDIV_MAX; HSEDiv++) {
-      if ((HSE_VALUE / HSEDiv) <= HSE_RTC_MAX) {
-        PeriphClkInit.RTCClockSelection = (HSEDiv << HSESHIFT) | RCC_RTCCLKSOURCE_HSE_DIVX;
-        break;
-      }
-    }
-#else
-#error "Unknown Family - could not define RTCClockSelection"
-#endif /* STM32F1xx */
+
     if ((HSE_VALUE / HSEDiv) > HSE_RTC_MAX) {
       Error_Handler();
     }
@@ -208,15 +151,8 @@ static void RTC_initClock(sourceClock_t source)
   */
 void RTC_setPrediv(int8_t asynch, int16_t synch)
 {
-#if !defined(STM32F1xx)
-  if ((asynch >= -1) && (synch >= -1)) {
-    userPredivAsync = asynch;
-    userPredivSync = synch;
-  }
-#else
   UNUSED(asynch);
   UNUSED(synch);
-#endif /* !STM32F1xx */
 }
 
 /**
@@ -228,74 +164,9 @@ void RTC_setPrediv(int8_t asynch, int16_t synch)
   */
 void RTC_getPrediv(int8_t *asynch, int16_t *synch)
 {
-#if !defined(STM32F1xx)
-  if ((userPredivAsync == -1) || (userPredivSync == -1)) {
-    RTC_computePrediv(asynch, synch);
-  } else {
-    if ((asynch != NULL) && (synch != NULL)) {
-      *asynch = userPredivAsync;
-      *synch = userPredivSync;
-    }
-  }
-#else
   UNUSED(asynch);
   UNUSED(synch);
-#endif /* !STM32F1xx */
 }
-
-#if !defined(STM32F1xx)
-/**
-  * @brief Compute (a)synchronous prescaler
-  *        RTC prescalers are compute to obtain the RTC clock to 1Hz. See AN4759.
-  * @param asynch: pointer where return asynchronous prescaler value.
-  * @param synch: pointer where return synchronous prescaler value.
-  * @retval None
-  */
-static void RTC_computePrediv(int8_t *asynch, int16_t *synch)
-{
-  uint32_t predivS = PREDIVS_MAX + 1;
-  uint32_t clk = 0;
-
-  /* Get user predividers if manually configured */
-  if ((asynch == NULL) || (synch == NULL)) {
-    return;
-  }
-
-  /* Get clock frequency */
-  if (clkSrc == LSE_CLOCK) {
-    clk = LSE_VALUE;
-  } else if (clkSrc == LSI_CLOCK) {
-    clk = LSI_VALUE;
-  } else if (clkSrc == HSE_CLOCK) {
-    clk = HSE_VALUE / HSEDiv;
-  } else {
-    Error_Handler();
-  }
-
-  /* Find (a)synchronous prescalers to obtain the 1Hz calendar clock */
-  for (*asynch = PREDIVA_MAX; *asynch >= 0; (*asynch)--) {
-    predivS = (clk / (*asynch + 1)) - 1;
-
-    if (((predivS + 1) * (*asynch + 1)) == clk) {
-      break;
-    }
-  }
-
-  /*
-   * Can't find a 1Hz, so give priority to RTC power consumption
-   * by choosing the higher possible value for predivA
-   */
-  if ((predivS > PREDIVS_MAX) || (*asynch < 0)) {
-    *asynch = PREDIVA_MAX;
-    predivS = (clk / (*asynch + 1)) - 1;
-  }
-
-  if (predivS > PREDIVS_MAX) {
-    Error_Handler();
-  }
-  *synch = (int16_t)predivS;
-}
-#endif /* !STM32F1xx */
 
 /**
   * @brief RTC Initialization
@@ -317,32 +188,12 @@ void RTC_init(hourFormat_t format, sourceClock_t source, bool reset)
 
   RtcHandle.Instance = RTC;
 
-#if defined(STM32F1xx)
   /* Let HAL calculate the prescaler */
   RtcHandle.Init.AsynchPrediv = RTC_AUTO_1_SECOND;
   RtcHandle.Init.OutPut = RTC_OUTPUTSOURCE_NONE;
   UNUSED(format);
-#else
-  if (format == HOUR_FORMAT_12) {
-    RtcHandle.Init.HourFormat = RTC_HOURFORMAT_12;
-  } else {
-    RtcHandle.Init.HourFormat = RTC_HOURFORMAT_24;
-  }
-  RtcHandle.Init.OutPut = RTC_OUTPUT_DISABLE;
-  RTC_getPrediv((int8_t *) & (RtcHandle.Init.AsynchPrediv), (int16_t *) & (RtcHandle.Init.SynchPrediv));
-#if defined(STM32G0xx) || defined(STM32H7xx) || defined(STM32L0xx) || defined(STM32L4xx)
-  RtcHandle.Init.OutPutRemap = RTC_OUTPUT_REMAP_NONE;
-#endif /* STM32H7xx || STM32L0xx || STM32L4xx */
-  RtcHandle.Init.OutPutPolarity = RTC_OUTPUT_POLARITY_HIGH;
-  RtcHandle.Init.OutPutType = RTC_OUTPUT_TYPE_OPENDRAIN;
-#endif /* STM32F1xx */
 
   HAL_RTC_Init(&RtcHandle);
-
-#if !defined(STM32F1xx) && !defined(STM32F2xx) && !defined(STM32L1xx) || defined(STM32L1_ULPH)
-  /* Enable Direct Read of the calendar registers (not through Shadow) */
-  HAL_RTCEx_EnableBypassShadow(&RtcHandle);
-#endif /* !STM32F1xx && !STM32F2xx */
 
   HAL_NVIC_SetPriority(RTC_Alarm_IRQn, RTC_IRQ_PRIO, RTC_IRQ_SUBPRIO);
   HAL_NVIC_EnableIRQ(RTC_Alarm_IRQn);
@@ -393,24 +244,6 @@ void RTC_SetTime(uint8_t hours, uint8_t minutes, uint8_t seconds, uint32_t subSe
     RTC_TimeStruct.Hours = hours;
     RTC_TimeStruct.Minutes = minutes;
     RTC_TimeStruct.Seconds = seconds;
-#if !defined(STM32F1xx)
-    if (period == HOUR_PM) {
-      RTC_TimeStruct.TimeFormat = RTC_HOURFORMAT12_PM;
-    } else {
-      RTC_TimeStruct.TimeFormat = RTC_HOURFORMAT12_AM;
-    }
-#if !defined(STM32F2xx) && !defined(STM32L1xx) || defined(STM32L1_ULPH)
-    RTC_TimeStruct.SubSeconds = subSeconds;
-    RTC_TimeStruct.SecondFraction = 0;
-#else
-    UNUSED(subSeconds);
-#endif /* !STM32F2xx && !STM32L1xx || STM32L1_ULPH */
-    RTC_TimeStruct.DayLightSaving = RTC_STOREOPERATION_RESET;
-    RTC_TimeStruct.StoreOperation = RTC_DAYLIGHTSAVING_NONE;
-#else
-    UNUSED(subSeconds);
-    UNUSED(period);
-#endif /* !STM32F1xx */
 
     HAL_RTC_SetTime(&RtcHandle, &RTC_TimeStruct, RTC_FORMAT_BIN);
     setBackupRegister(RTC_BKP_INDEX, RTC_BKP_VALUE);
@@ -435,25 +268,8 @@ void RTC_GetTime(uint8_t *hours, uint8_t *minutes, uint8_t *seconds, uint32_t *s
     *hours = RTC_TimeStruct.Hours;
     *minutes = RTC_TimeStruct.Minutes;
     *seconds = RTC_TimeStruct.Seconds;
-#if !defined(STM32F1xx)
-    if (period != NULL) {
-      if (RTC_TimeStruct.TimeFormat == RTC_HOURFORMAT12_PM) {
-        *period = HOUR_PM;
-      } else {
-        *period = HOUR_AM;
-      }
-    }
-#if (!defined(STM32F2xx) && !defined(STM32L1xx)) || defined(STM32L1_ULPH)
-    if (subSeconds != NULL) {
-      *subSeconds = RTC_TimeStruct.SubSeconds;
-    }
-#else
-    UNUSED(subSeconds);
-#endif
-#else
     UNUSED(period);
     UNUSED(subSeconds);
-#endif /* !STM32F1xx */
   }
 }
 
@@ -529,46 +345,11 @@ void RTC_StartAlarm(uint8_t day, uint8_t hours, uint8_t minutes, uint8_t seconds
     RTC_AlarmStructure.AlarmTime.Seconds = seconds;
     RTC_AlarmStructure.AlarmTime.Minutes = minutes;
     RTC_AlarmStructure.AlarmTime.Hours = hours;
-#if !defined(STM32F1xx)
-#if !defined(STM32F2xx) && !defined(STM32L1xx) || defined(STM32L1_ULPH)
-    RTC_AlarmStructure.AlarmSubSecondMask = RTC_ALARMSUBSECONDMASK_SS14_10;
-    RTC_AlarmStructure.AlarmTime.SubSeconds = subSeconds;
-#else
-    UNUSED(subSeconds);
-#endif /* !STM32F2xx && !STM32L1xx || STM32L1_ULPH */
-    if (period == HOUR_PM) {
-      RTC_AlarmStructure.AlarmTime.TimeFormat = RTC_HOURFORMAT12_PM;
-    } else {
-      RTC_AlarmStructure.AlarmTime.TimeFormat = RTC_HOURFORMAT12_AM;
-    }
-    RTC_AlarmStructure.AlarmTime.DayLightSaving = RTC_DAYLIGHTSAVING_NONE;
-    RTC_AlarmStructure.AlarmTime.StoreOperation = RTC_STOREOPERATION_RESET;
-    RTC_AlarmStructure.AlarmDateWeekDay = day;
-    RTC_AlarmStructure.AlarmDateWeekDaySel = RTC_ALARMDATEWEEKDAYSEL_DATE;
-    /* configure AlarmMask (M_MSK and Y_MSK ignored) */
-    if (mask == OFF_MSK) {
-      RTC_AlarmStructure.AlarmMask = RTC_ALARMMASK_ALL;
-    } else {
-      RTC_AlarmStructure.AlarmMask = RTC_ALARMMASK_NONE;
-      if (!(mask & SS_MSK)) {
-        RTC_AlarmStructure.AlarmMask |= RTC_ALARMMASK_SECONDS;
-      }
-      if (!(mask & MM_MSK)) {
-        RTC_AlarmStructure.AlarmMask |= RTC_ALARMMASK_MINUTES;
-      }
-      if (!(mask & HH_MSK)) {
-        RTC_AlarmStructure.AlarmMask |= RTC_ALARMMASK_HOURS;
-      }
-      if (!(mask & D_MSK)) {
-        RTC_AlarmStructure.AlarmMask |= RTC_ALARMMASK_DATEWEEKDAY;
-      }
-    }
-#else
+
     UNUSED(subSeconds);
     UNUSED(period);
     UNUSED(day);
     UNUSED(mask);
-#endif /* !STM32F1xx */
 
     /* Set RTC_Alarm */
     HAL_RTC_SetAlarm_IT(&RtcHandle, &RTC_AlarmStructure, RTC_FORMAT_BIN);
@@ -612,45 +393,10 @@ void RTC_GetAlarm(uint8_t *day, uint8_t *hours, uint8_t *minutes, uint8_t *secon
     *minutes = RTC_AlarmStructure.AlarmTime.Minutes;
     *hours = RTC_AlarmStructure.AlarmTime.Hours;
 
-#if !defined(STM32F1xx)
-    if (day != NULL) {
-      *day = RTC_AlarmStructure.AlarmDateWeekDay;
-    }
-    if (period != NULL) {
-      if (RTC_AlarmStructure.AlarmTime.TimeFormat == RTC_HOURFORMAT12_PM) {
-        *period = HOUR_PM;
-      } else {
-        *period = HOUR_AM;
-      }
-    }
-#if !defined(STM32F2xx) && !defined(STM32L1xx) || defined(STM32L1_ULPH)
-    if (subSeconds != NULL) {
-      *subSeconds = RTC_AlarmStructure.AlarmTime.SubSeconds;
-    }
-#else
-    UNUSED(subSeconds);
-#endif /* !STM32F2xx && !STM32L1xx || STM32L1_ULPH */
-    if (mask != NULL) {
-      *mask = OFF_MSK;
-      if (!(RTC_AlarmStructure.AlarmMask & RTC_ALARMMASK_SECONDS)) {
-        *mask |= SS_MSK;
-      }
-      if (!(RTC_AlarmStructure.AlarmMask & RTC_ALARMMASK_MINUTES)) {
-        *mask |= MM_MSK;
-      }
-      if (!(RTC_AlarmStructure.AlarmMask & RTC_ALARMMASK_HOURS)) {
-        *mask |= HH_MSK;
-      }
-      if (!(RTC_AlarmStructure.AlarmMask & RTC_ALARMMASK_DATEWEEKDAY)) {
-        *mask |= D_MSK;
-      }
-    }
-#else
     UNUSED(day);
     UNUSED(period);
     UNUSED(subSeconds);
     UNUSED(mask);
-#endif /* !STM32F1xx */
   }
 }
 

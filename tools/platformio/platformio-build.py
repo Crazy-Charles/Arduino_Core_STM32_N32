@@ -164,7 +164,7 @@ env.Append(
         #join(FRAMEWORK_DIR, "cores", "arduino", "N32G45x", "usb", "cdc"),
         join(FRAMEWORK_DIR, "system", "Drivers", "N32G45x_HAL_Driver", "Inc"),
         join(FRAMEWORK_DIR, "system", "Drivers", "N32G45x_HAL_Driver", "Src"),
-        join(FRAMEWORK_DIR, "system", "N32G4xx"),
+        join(FRAMEWORK_DIR, "system", "N32G45x"),
         # join(
         #     FRAMEWORK_DIR,
         #     "system",

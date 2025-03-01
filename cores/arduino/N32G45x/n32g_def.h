@@ -1,5 +1,5 @@
-#ifndef _STM32_DEF_
-#define _STM32_DEF_
+#ifndef _N32G_DEF_
+#define _N32G_DEF_
 
 
 /**
@@ -56,4 +56,4 @@ void _Error_Handler(const char *, int);
 } // extern "C"
 #endif // __cplusplus
 
-#endif //_STM32_DEF_
+#endif //_N32G_DEF_

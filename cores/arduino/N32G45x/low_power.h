@@ -40,7 +40,7 @@
 #define __LOW_POWER_H
 
 /* Includes ------------------------------------------------------------------*/
-#include "stm32_def.h"
+#include "n32g_def.h"
 #include "uart.h"
 
 #if defined(HAL_PWR_MODULE_ENABLED) && !defined(HAL_PWR_MODULE_ONLY)

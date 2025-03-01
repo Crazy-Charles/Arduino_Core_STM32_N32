@@ -1,4 +1,4 @@
-#include "stm32_def.h"
+#include "n32g_def.h"
 #include "core_debug.h"
 
 #ifdef __cplusplus

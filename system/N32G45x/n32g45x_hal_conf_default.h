@@ -1,10 +1,7 @@
 /**
   ******************************************************************************
-  * @file    stm32f1xx_hal_conf.h
-  * @author  MCD Application Team
-  * @brief   HAL configuration template file.
-  *          This file should be copied to the application folder and renamed
-  *          to stm32f1xx_hal_conf.h.
+  * @file    stm32f1xx_hal_conf_default.h
+  * @brief   HAL default configuration file.
   ******************************************************************************
   * @attention
   *
@@ -20,8 +17,8 @@
   */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __STM32F1xx_HAL_CONF_H
-#define __STM32F1xx_HAL_CONF_H
+#ifndef __N32G45x_HAL_CONF_DEFAULT_H
+#define __N32G45x_HAL_CONF_DEFAULT_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -32,12 +29,18 @@ extern "C" {
 
 /* ########################## Module Selection ############################## */
 /**
+  * @brief Include the default list of modules to be used in the HAL driver
+  *        and manage module deactivation
+  */
+#include "n32g_hal_conf.h"
+#if 0
+/**
   * @brief This is the list of modules to be used in the HAL driver
   */
 #define HAL_MODULE_ENABLED
 #define HAL_ADC_MODULE_ENABLED
 #define HAL_CAN_MODULE_ENABLED
-/* #define HAL_CAN_LEGACY_MODULE_ENABLED */
+/*#define HAL_CAN_LEGACY_MODULE_ENABLED*/
 #define HAL_CEC_MODULE_ENABLED
 #define HAL_CORTEX_MODULE_ENABLED
 #define HAL_CRC_MODULE_ENABLED
@@ -68,6 +71,7 @@ extern "C" {
 #define HAL_USART_MODULE_ENABLED
 #define HAL_WWDG_MODULE_ENABLED
 #define HAL_MMC_MODULE_ENABLED
+#endif
 
 /* ########################## Oscillator Values adaptation ####################*/
 /**
@@ -123,10 +127,18 @@ extern "C" {
 /**
   * @brief This is the HAL system configuration section
   */
+#if !defined(VDD_VALUE)
 #define  VDD_VALUE                    3300U /*!< Value of VDD in mv */
-#define  TICK_INT_PRIORITY            0x0FU /*!< tick interrupt priority */
+#endif
+#if !defined (TICK_INT_PRIORITY)
+#define  TICK_INT_PRIORITY            0x00U /*!< tick interrupt priority */
+#endif
+#if !defined (USE_RTOS)
 #define  USE_RTOS                     0U
+#endif
+#if !defined (PREFETCH_ENABLE)
 #define  PREFETCH_ENABLE              1U
+#endif
 
 #define  USE_HAL_ADC_REGISTER_CALLBACKS         0U /* ADC register callback disabled       */
 #define  USE_HAL_CAN_REGISTER_CALLBACKS         0U /* CAN register callback disabled       */
@@ -231,8 +243,9 @@ extern "C" {
 * Activated: CRC code is present inside driver
 * Deactivated: CRC code cleaned from driver
 */
-
-#define USE_SPI_CRC                     1U
+#if !defined (USE_SPI_CRC)
+#define USE_SPI_CRC                     0U
+#endif
 
 /* Includes ------------------------------------------------------------------*/
 /**
@@ -383,7 +396,7 @@ extern "C" {
   */
 #define assert_param(expr) ((expr) ? (void)0U : assert_failed((uint8_t *)__FILE__, __LINE__))
 /* Exported functions ------------------------------------------------------- */
-void assert_failed(uint8_t* file, uint32_t line);
+void assert_failed(uint8_t *file, uint32_t line);
 #else
 #define assert_param(expr) ((void)0U)
 #endif /* USE_FULL_ASSERT */
@@ -393,7 +406,7 @@ void assert_failed(uint8_t* file, uint32_t line);
 }
 #endif
 
-#endif /* __STM32F1xx_HAL_CONF_H */
+#endif /* __N32G45x_HAL_CONF_DEFAULT_H was __STM32F1xx_HAL_CONF_DEFAULT_H */
 
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

@@ -16,8 +16,8 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#ifndef _VARIANT_ARDUINO_STM32_
-#define _VARIANT_ARDUINO_STM32_
+#ifndef _VARIANT_ARDUINO_N32_
+#define _VARIANT_ARDUINO_N32_
 
 #ifdef __cplusplus
 extern "C" {
@@ -152,4 +152,4 @@ extern "C" {
   #define SERIAL_PORT_HARDWARE    Serial1
 #endif
 
-#endif /* _VARIANT_ARDUINO_STM32_ */
+#endif /* _VARIANT_ARDUINO_N32_ */

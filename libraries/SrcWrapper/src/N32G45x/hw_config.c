@@ -35,7 +35,7 @@
   *
   ******************************************************************************
   */
-#include "stm32_def.h"
+#include "n32g_def.h"
 #include "hw_config.h"
 
 #include "dwt.h"

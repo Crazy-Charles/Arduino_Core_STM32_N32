@@ -52,10 +52,6 @@ static UART_HandleTypeDef *WakeUpUart = NULL;
 /* Save callback pointer */
 static void (*WakeUpUartCb)(void) = NULL;
 
-#ifdef STM32G0xx
-#define PWR_FLAG_WU PWR_FLAG_WUF
-#endif
-
 /**
   * @brief  Initialize low power mode
   * @param  None
@@ -63,10 +59,9 @@ static void (*WakeUpUartCb)(void) = NULL;
   */
 void LowPower_init()
 {
-#if !defined(STM32H7xx) && !defined(STM32MP1xx) && !defined(STM32WBxx)
   /* Enable Power Clock */
   __HAL_RCC_PWR_CLK_ENABLE();
-#endif
+
   /* Allow access to Backup domain */
   HAL_PWR_EnableBkUpAccess();
 
@@ -215,13 +210,6 @@ void LowPower_stop(serial_t *obj)
   }
 #endif
 
-#if defined(STM32L0xx) || defined(STM32L1xx)
-  /* Enable Ultra low power mode */
-  HAL_PWREx_EnableUltraLowPower();
-
-  /* Enable the fast wake up from Ultra low power mode */
-  HAL_PWREx_EnableFastWakeUp();
-#endif
 #ifdef __HAL_RCC_WAKEUPSTOP_CLK_CONFIG
   /* Select HSI as system clock source after Wake Up from Stop mode */
   __HAL_RCC_WAKEUPSTOP_CLK_CONFIG(RCC_STOP_WAKEUPCLOCK_HSI);
@@ -258,15 +246,6 @@ void LowPower_stop(serial_t *obj)
 void LowPower_standby()
 {
   __disable_irq();
-
-#if defined(STM32L0xx) || defined(STM32L1xx)
-  /* Enable Ultra low power mode */
-  HAL_PWREx_EnableUltraLowPower();
-
-  /* Enable the fast wake up from Ultra low power mode */
-  HAL_PWREx_EnableFastWakeUp();
-#endif
-
   HAL_PWR_EnterSTANDBYMode();
 }
 
@@ -279,12 +258,6 @@ void LowPower_standby()
 void LowPower_shutdown()
 {
   __disable_irq();
-#ifdef STM32L4xx
-  /* LSE must be on to use shutdown mode */
-  if (__HAL_RCC_GET_FLAG(RCC_FLAG_LSERDY) == SET) {
-    HAL_PWREx_EnterSHUTDOWNMode();
-  } else
-#endif
   {
     LowPower_standby();
   }

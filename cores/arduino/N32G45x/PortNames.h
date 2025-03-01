@@ -30,7 +30,7 @@
 #ifndef _PORTNAMES_H
 #define _PORTNAMES_H
 
-#include "stm32_def.h"
+#include "n32g_def.h"
 
 #ifdef __cplusplus
 extern "C" {

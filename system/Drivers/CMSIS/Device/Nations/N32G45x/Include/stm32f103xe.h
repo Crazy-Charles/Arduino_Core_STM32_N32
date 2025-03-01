@@ -173,8 +173,8 @@ typedef enum IRQn
   */
 
 #include "core_cm4.h"
-#include "system_stm32f1xx.h"
-//#include "system_n32g45x.h"
+//#include "system_stm32f1xx.h"
+#include "system_n32g45x.h"
 #include <stdint.h>
 
 /** @addtogroup Peripheral_registers_structures

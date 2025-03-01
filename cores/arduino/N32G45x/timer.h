@@ -16,7 +16,7 @@
 #define __TIMER_H
 
 /* Includes ------------------------------------------------------------------*/
-#include "stm32_def.h"
+#include "n32g_def.h"
 #include "PinNames.h"
 
 #ifdef __cplusplus

@@ -36,7 +36,7 @@
   ******************************************************************************
   */
 #include "core_debug.h"
-#include "stm32_def.h"
+#include "n32g_def.h"
 #include "utility/spi_com.h"
 #include "PinAF_STM32F1.h"
 #include "pinconfig.h"

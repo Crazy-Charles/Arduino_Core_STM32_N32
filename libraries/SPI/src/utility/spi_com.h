@@ -40,7 +40,7 @@
 #define __SPI_COM_H
 
 /* Includes ------------------------------------------------------------------*/
-#include "stm32_def.h"
+#include "n32g_def.h"
 #include "PeripheralPins.h"
 
 #ifdef __cplusplus

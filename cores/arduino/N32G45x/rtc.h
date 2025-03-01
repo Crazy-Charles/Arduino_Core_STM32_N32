@@ -41,7 +41,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include <stdbool.h>
-#include "stm32_def.h"
+#include "n32g_def.h"
 #include "backup.h"
 #include "clock.h"
 

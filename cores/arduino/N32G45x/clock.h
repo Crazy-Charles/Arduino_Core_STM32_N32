@@ -40,7 +40,7 @@
 #define __CLOCK_H
 
 /* Includes ------------------------------------------------------------------*/
-#include "stm32_def.h"
+#include "n32g_def.h"
 
 #ifdef __cplusplus
 extern "C" {
