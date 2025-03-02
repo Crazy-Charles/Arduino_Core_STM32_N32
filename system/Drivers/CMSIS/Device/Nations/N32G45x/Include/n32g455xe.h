@@ -34,8 +34,8 @@
   * @{
   */
 
-#ifndef __STM32F103xE_H
-#define __STM32F103xE_H
+#ifndef __N32G455xE_H
+#define __N32G455xE_H
 
 #ifdef __cplusplus
  extern "C" {
@@ -11789,7 +11789,7 @@ typedef struct
   }
 #endif /* __cplusplus */
 
-#endif /* __STM32F103xE_H */
+#endif /* __N32G455xE_H was __STM32F103xE_H */
 
 
 

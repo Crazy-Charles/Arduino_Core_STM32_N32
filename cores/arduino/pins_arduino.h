@@ -330,7 +330,7 @@ uint32_t digitalPinToAnalogInput(uint32_t pin);
 
 // Default Definitions, could be redefined in variant.h
 #ifndef ADC_RESOLUTION
-  #define ADC_RESOLUTION              10
+  #define ADC_RESOLUTION              12
 #endif
 
 #define DACC_RESOLUTION             12
