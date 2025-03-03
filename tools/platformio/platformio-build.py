@@ -28,9 +28,7 @@ assert isdir(CMSIS_DIR)
 
 mcu = env.BoardConfig().get("build.mcu", "")
 board_name = env.subst("$BOARD")
-mcu_type = mcu[:-2]
 variant = board.get("build.variant")
-series = mcu_type[:7].upper() + "xx"
 variants_dir = (
     join("$PROJECT_DIR", board.get("build.variants_dir"))
     if board.get("build.variants_dir", "")
@@ -38,90 +36,6 @@ variants_dir = (
 )
 variant_dir = join(variants_dir, variant)
 upload_protocol = env.subst("$UPLOAD_PROTOCOL")
-
-
-def process_standard_library_configuration(cpp_defines):
-    if "PIO_FRAMEWORK_ARDUINO_STANDARD_LIB" in cpp_defines:
-        env["LINKFLAGS"].remove("--specs=nano.specs")
-    if "PIO_FRAMEWORK_ARDUINO_NANOLIB_FLOAT_PRINTF" in cpp_defines:
-        env.Append(LINKFLAGS=["-u_printf_float"])
-    if "PIO_FRAMEWORK_ARDUINO_NANOLIB_FLOAT_SCANF" in cpp_defines:
-        env.Append(LINKFLAGS=["-u_scanf_float"])
-
-
-def process_usart_configuration(cpp_defines):
-    if "PIO_FRAMEWORK_ARDUINO_SERIAL_DISABLED" in cpp_defines:
-        env["CPPDEFINES"].remove("HAL_UART_MODULE_ENABLED")
-
-    elif "PIO_FRAMEWORK_ARDUINO_SERIAL_WITHOUT_GENERIC" in cpp_defines:
-        env.Append(CPPDEFINES=["HWSERIAL_NONE"])
-
-
-def process_usb_speed_configuration(cpp_defines):
-    if "PIO_FRAMEWORK_ARDUINO_USB_HIGHSPEED" in cpp_defines:
-        env.Append(CPPDEFINES=["USE_USB_HS"])
-
-    elif "PIO_FRAMEWORK_ARDUINO_USB_HIGHSPEED_FULLMODE" in cpp_defines:
-        env.Append(CPPDEFINES=["USE_USB_HS", "USE_USB_HS_IN_FS"])
-
-
-def process_usb_configuration(cpp_defines):
-    if "PIO_FRAMEWORK_ARDUINO_ENABLE_CDC" in cpp_defines:
-        env.Append(CPPDEFINES=["USBD_USE_CDC"])
-
-    elif "PIO_FRAMEWORK_ARDUINO_ENABLE_CDC_WITHOUT_SERIAL" in cpp_defines:
-        env.Append(CPPDEFINES=["USBD_USE_CDC", "DISABLE_GENERIC_SERIALUSB"])
-
-    elif "PIO_FRAMEWORK_ARDUINO_ENABLE_HID" in cpp_defines:
-        env.Append(CPPDEFINES=["USBD_USE_HID_COMPOSITE"])
-
-    if any(f in env["CPPDEFINES"] for f in ("USBD_USE_CDC", "USBD_USE_HID_COMPOSITE")):
-        env.Append(CPPDEFINES=["HAL_PCD_MODULE_ENABLED"])
-
-
-# def get_arm_math_lib(cpu):
-#     core = board.get("build.cpu")[7:9]
-#     if core == "m4":
-#         return "arm_cortexM4lf_math"
-#     elif core == "m7":
-#         return "arm_cortexM7lfsp_math"
-
-#     return "arm_cortex%sl_math" % core.upper()
-
-
-def configure_application_offset(mcu, upload_protocol):
-    offset = 0
-
-    # if upload_protocol == "hid":
-    #     if mcu.startswith("stm32f1"):
-    #         offset = 0x800
-    #     elif mcu.startswith("stm32f4"):
-    #         offset = 0x4000
-
-    #     env.Append(CPPDEFINES=["BL_HID"])
-
-    # elif upload_protocol == "dfu":
-    #     # STM32F103 series doesn't have embedded DFU over USB
-    #     # stm32duino bootloader (v1, v2) is used instead
-    #     if mcu.startswith("stm32f103"):
-    #         if board.get("upload.boot_version", 2) == 1:
-    #             offset = 0x5000
-    #         else:
-    #             offset = 0x2000
-    #         env.Append(CPPDEFINES=["BL_LEGACY_LEAF"])
-
-    # if offset != 0:
-    #     env.Append(CPPDEFINES=[("VECT_TAB_OFFSET", "%s" % hex(offset))],)
-
-    # LD_FLASH_OFFSET is mandatory even if there is no offset
-    env.Append(LINKFLAGS=["-Wl,--defsym=LD_FLASH_OFFSET=%s" % hex(offset)])
-
-
-# if any(mcu in board.get("build.cpu") for mcu in ("cortex-m4", "cortex-m7")):
-#     env.Append(
-#         CCFLAGS=["-mfpu=fpv4-sp-d16", "-mfloat-abi=hard"],
-#         LINKFLAGS=["-mfpu=fpv4-sp-d16", "-mfloat-abi=hard"],
-#     )
 
 env.Append(
     ASFLAGS=["-x", "assembler-with-cpp"],
@@ -147,9 +61,9 @@ env.Append(
         "-mfloat-abi=hard",
     ],
     CPPDEFINES=[
-        series,
+        "STM32F1xx",
+        "STM32F103xE",
         ("ARDUINO", 10808),
-        "ARDUINO_ARCH_N32",
         "ARDUINO_%s" % board_name.upper(),
         ("BOARD_NAME", '\\"%s\\"' % board_name.upper()),
         "HAL_UART_MODULE_ENABLED",
@@ -157,63 +71,9 @@ env.Append(
     CPPPATH=[
         join(FRAMEWORK_DIR, "cores", "arduino", "avr"),
         join(FRAMEWORK_DIR, "cores", "arduino", "N32G45x"),
-        join(FRAMEWORK_DIR, "cores", "arduino", "N32G45x", "LL"),
-        #join(FRAMEWORK_DIR, "cores", "arduino", "N32G45x", "usb"),
-        #join(FRAMEWORK_DIR, "cores", "arduino", "N32G45x", "OpenAMP"),
-        #join(FRAMEWORK_DIR, "cores", "arduino", "N32G45x", "usb", "hid"),
-        #join(FRAMEWORK_DIR, "cores", "arduino", "N32G45x", "usb", "cdc"),
         join(FRAMEWORK_DIR, "system", "Drivers", "N32G45x_HAL_Driver", "Inc"),
         join(FRAMEWORK_DIR, "system", "Drivers", "N32G45x_HAL_Driver", "Src"),
         join(FRAMEWORK_DIR, "system", "N32G45x"),
-        # join(
-        #     FRAMEWORK_DIR,
-        #     "system",
-        #     "Middlewares",
-        #     "ST",
-        #     "STM32_USB_Device_Library",
-        #     "Core",
-        #     "Inc",
-        # ),
-        # join(
-        #     FRAMEWORK_DIR,
-        #     "system",
-        #     "Middlewares",
-        #     "ST",
-        #     "STM32_USB_Device_Library",
-        #     "Core",
-        #     "Src",
-        # ),
-        # join(
-        #     FRAMEWORK_DIR,
-        #     "system",
-        #     "Middlewares",
-        #     "OpenAMP"
-        # ),
-        # join(
-        #     FRAMEWORK_DIR,
-        #     "system",
-        #     "Middlewares",
-        #     "OpenAMP",
-        #     "open-amp",
-        #     "lib",
-        #     "include",
-        # ),
-        # join(
-        #     FRAMEWORK_DIR,
-        #     "system",
-        #     "Middlewares",
-        #     "OpenAMP",
-        #     "libmetal",
-        #     "lib",
-        #     "include",
-        # ),
-        # join(
-        #     FRAMEWORK_DIR,
-        #     "system",
-        #     "Middlewares",
-        #     "OpenAMP",
-        #     "virtual_driver"
-        # ),
         join(CMSIS_DIR, "Core", "Include"),
         join(
             FRAMEWORK_DIR,
@@ -253,6 +113,7 @@ env.Append(
         "-Wl,--warn-common",
         "-Wl,--defsym=LD_MAX_SIZE=%d" % board.get("upload.maximum_size"),
         "-Wl,--defsym=LD_MAX_DATA_SIZE=%d" % board.get("upload.maximum_ram_size"),
+        "-Wl,--defsym=LD_FLASH_OFFSET=0x0",
         "-mfpu=fpv4-sp-d16", 
         "-mfloat-abi=hard",
     ],
@@ -266,10 +127,6 @@ env.Append(
     LIBPATH=[variant_dir, join(CMSIS_DIR, "DSP", "Lib", "GCC")],
 )
 
-env.ProcessFlags(board.get("build.framework_extra_flags.arduino", ""))
-
-configure_application_offset(mcu, upload_protocol)
-
 #
 # Linker requires preprocessing with correct RAM|ROM sizes
 #
@@ -280,23 +137,11 @@ if not board.get("build.ldscript", ""):
         print("Warning! Cannot find linker script for the current target!\n")
     env.Append(LINKFLAGS=[("-Wl,--default-script", join(variant_dir, "ldscript.ld"))])
 
-#
-# Process configuration flags
-#
-
-cpp_defines = env.Flatten(env.get("CPPDEFINES", []))
-
-process_standard_library_configuration(cpp_defines)
-process_usb_configuration(cpp_defines)
-process_usb_speed_configuration(cpp_defines)
-process_usart_configuration(cpp_defines)
-
 # copy CCFLAGS to ASFLAGS (-x assembler-with-cpp mode)
 env.Append(ASFLAGS=env.get("CCFLAGS", [])[:])
 
 env.Append(
     LIBSOURCE_DIRS=[
-        # join(FRAMEWORK_DIR, "libraries", "__cores__", "arduino"),
         join(FRAMEWORK_DIR, "libraries"),
     ]
 )
@@ -316,7 +161,7 @@ env.BuildSources(
 )
 
 env.BuildSources(
-    join("$BUILD_DIR", "SrcWrapper"), join(FRAMEWORK_DIR, "libraries", "SrcWrapper")
+    join("$BUILD_DIR", "CoreDrivers"), join(FRAMEWORK_DIR, "libraries", "CoreDrivers")
 )
 
 env.Prepend(LIBS=libs)

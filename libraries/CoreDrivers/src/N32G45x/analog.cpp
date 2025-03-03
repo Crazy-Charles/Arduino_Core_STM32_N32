@@ -627,7 +627,7 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef *hadc)
   /* For STM32F1xx, STM32H7xx, and STM32MP1xx ADC prescaler is configured in
      SystemClock_Config (variant.cpp) */
 #if defined(__HAL_RCC_ADC_CONFIG) && !defined(STM32F1xx) && \
-    !defined(STM32H7xx) && !defined(STM32MP1xx)
+     !defined(STM32H7xx) && !defined(STM32MP1xx)
   /* ADC Periph interface clock configuration */
   __HAL_RCC_ADC_CONFIG(RCC_ADCCLKSOURCE_SYSCLK);
 #endif

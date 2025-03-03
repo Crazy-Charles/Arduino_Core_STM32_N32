@@ -80,11 +80,7 @@ extern "C" {
   *        (when HSE is used as system clock source, directly or through the PLL).
   */
 #if !defined  (HSE_VALUE)
-#if defined(USE_STM3210C_EVAL)
-#define HSE_VALUE    25000000U /*!< Value of the External oscillator in Hz */
-#else
 #define HSE_VALUE    8000000U /*!< Value of the External oscillator in Hz */
-#endif
 #endif /* HSE_VALUE */
 
 #if !defined  (HSE_STARTUP_TIMEOUT)
@@ -290,6 +286,7 @@ extern "C" {
 
 #ifdef HAL_ADC_MODULE_ENABLED
 #include "stm32f1xx_hal_adc.h"
+//#include "n32g45x_adc.h"
 #endif /* HAL_ADC_MODULE_ENABLED */
 
 #ifdef HAL_CRC_MODULE_ENABLED
