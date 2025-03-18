@@ -37,6 +37,44 @@ variants_dir = (
 variant_dir = join(variants_dir, variant)
 upload_protocol = env.subst("$UPLOAD_PROTOCOL")
 
+def process_standard_library_configuration(cpp_defines):
+    if "PIO_FRAMEWORK_ARDUINO_STANDARD_LIB" in cpp_defines:
+        env["LINKFLAGS"].remove("--specs=nano.specs")
+    if "PIO_FRAMEWORK_ARDUINO_NANOLIB_FLOAT_PRINTF" in cpp_defines:
+        env.Append(LINKFLAGS=["-u_printf_float"])
+    if "PIO_FRAMEWORK_ARDUINO_NANOLIB_FLOAT_SCANF" in cpp_defines:
+        env.Append(LINKFLAGS=["-u_scanf_float"])
+
+
+def process_usart_configuration(cpp_defines):
+    if "PIO_FRAMEWORK_ARDUINO_SERIAL_DISABLED" in cpp_defines:
+        env["CPPDEFINES"].remove("HAL_UART_MODULE_ENABLED")
+
+    elif "PIO_FRAMEWORK_ARDUINO_SERIAL_WITHOUT_GENERIC" in cpp_defines:
+        env.Append(CPPDEFINES=["HWSERIAL_NONE"])
+
+
+def process_usb_speed_configuration(cpp_defines):
+    if "PIO_FRAMEWORK_ARDUINO_USB_HIGHSPEED" in cpp_defines:
+        env.Append(CPPDEFINES=["USE_USB_HS"])
+
+    elif "PIO_FRAMEWORK_ARDUINO_USB_HIGHSPEED_FULLMODE" in cpp_defines:
+        env.Append(CPPDEFINES=["USE_USB_HS", "USE_USB_HS_IN_FS"])
+
+
+def process_usb_configuration(cpp_defines):
+    if "PIO_FRAMEWORK_ARDUINO_ENABLE_CDC" in cpp_defines:
+        env.Append(CPPDEFINES=["USBD_USE_CDC"])
+
+    elif "PIO_FRAMEWORK_ARDUINO_ENABLE_CDC_WITHOUT_SERIAL" in cpp_defines:
+        env.Append(CPPDEFINES=["USBD_USE_CDC", "DISABLE_GENERIC_SERIALUSB"])
+
+    elif "PIO_FRAMEWORK_ARDUINO_ENABLE_HID" in cpp_defines:
+        env.Append(CPPDEFINES=["USBD_USE_HID_COMPOSITE"])
+
+    if any(f in env["CPPDEFINES"] for f in ("USBD_USE_CDC", "USBD_USE_HID_COMPOSITE")):
+        env.Append(CPPDEFINES=["HAL_PCD_MODULE_ENABLED"])
+
 env.Append(
     ASFLAGS=["-x", "assembler-with-cpp"],
     CFLAGS=["-std=gnu11"],
@@ -71,6 +109,9 @@ env.Append(
     CPPPATH=[
         join(FRAMEWORK_DIR, "cores", "arduino", "avr"),
         join(FRAMEWORK_DIR, "cores", "arduino", "N32G45x"),
+        join(FRAMEWORK_DIR, "cores", "arduino", "N32G45x", "usb"),
+        join(FRAMEWORK_DIR, "cores", "arduino", "N32G45x", "usb", "hid"),
+        join(FRAMEWORK_DIR, "cores", "arduino", "N32G45x", "usb", "cdc"),
         join(FRAMEWORK_DIR, "system", "Drivers", "N32G45x_HAL_Driver", "Inc"),
         join(FRAMEWORK_DIR, "system", "Drivers", "N32G45x_HAL_Driver", "Src"),
         join(FRAMEWORK_DIR, "system", "N32G45x"),
@@ -80,9 +121,6 @@ env.Append(
             "system",
             "Drivers",
             "CMSIS",
-            "Device",
-            "Nations",
-            "N32G45x",
             "Include",
         ),
         join(
@@ -90,12 +128,27 @@ env.Append(
             "system",
             "Drivers",
             "CMSIS",
-            "Device",
-            "Nations",
-            "N32G45x",
             "Source",
             "Templates",
             "gcc",
+        ),
+        join(
+            FRAMEWORK_DIR,
+            "system",
+            "Middlewares",
+            "ST",
+            "STM32_USB_Device_Library",
+            "Core",
+            "Inc",
+        ),
+        join(
+            FRAMEWORK_DIR,
+            "system",
+            "Middlewares",
+            "ST",
+            "STM32_USB_Device_Library",
+            "Core",
+            "Src",
         ),
         join(CMSIS_DIR, "DSP", "Include"),
         join(FRAMEWORK_DIR, "cores", "arduino"),
@@ -137,6 +190,17 @@ if not board.get("build.ldscript", ""):
         print("Warning! Cannot find linker script for the current target!\n")
     env.Append(LINKFLAGS=[("-Wl,--default-script", join(variant_dir, "ldscript.ld"))])
 
+#
+# Process configuration flags
+#
+
+cpp_defines = env.Flatten(env.get("CPPDEFINES", []))
+
+process_standard_library_configuration(cpp_defines)
+process_usb_configuration(cpp_defines)
+process_usb_speed_configuration(cpp_defines)
+process_usart_configuration(cpp_defines)
+
 # copy CCFLAGS to ASFLAGS (-x assembler-with-cpp mode)
 env.Append(ASFLAGS=env.get("CCFLAGS", [])[:])
 
@@ -154,7 +218,7 @@ libs = []
 
 if "build.variant" in env.BoardConfig():
     env.Append(CPPPATH=[variant_dir])
-    env.BuildSources(join("$BUILD_DIR", "FrameworkArduinoVariant"), variant_dir)
+    env.BuildSources(join("$BUILD_DIR", "Variant"), variant_dir)
 
 env.BuildSources(
     join("$BUILD_DIR", "FrameworkArduino"), join(FRAMEWORK_DIR, "cores", "arduino")

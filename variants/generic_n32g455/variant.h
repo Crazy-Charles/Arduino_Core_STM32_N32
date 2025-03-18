@@ -88,17 +88,6 @@ extern "C" {
 // This must be a literal with a value less than or equal to to MAX_ANALOG_INPUTS
 #define NUM_ANALOG_INPUTS       16
 
-// On-board LED pin number
-// #ifndef LED_BUILTIN
-// #define LED_BUILTIN             PB11
-// #endif
-// #define LED_GREEN               LED_BUILTIN
-
-// On-board user button
-// #ifndef USER_BTN
-// #define USER_BTN                PC13
-// #endif
-
 // Override default Arduino configuration
 // SPI Definitions
 #define PIN_SPI_SS              PA4

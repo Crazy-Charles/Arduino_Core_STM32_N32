@@ -289,6 +289,12 @@ typedef struct
 
 /* Flags in the CSR register */
 #define RCC_FLAG_LSIRDY                  ((uint8_t)((CSR_REG_INDEX << 5U) | RCC_CSR_LSIRDY_Pos))   /*!< Internal Low Speed oscillator Ready */
+#define RCC_FLAG_BORRST                  ((uint8_t)((CSR_REG_INDEX << 5U) | RCC_CSR_BORRSTF_Pos))  /*!< BOR reset flag */
+#define RCC_FLAG_RETEMC                  ((uint8_t)((CSR_REG_INDEX << 5U) | RCC_CSR_RETEMCF_Pos))  /*!< Retention domain EMC reset flag */
+#define RCC_FLAG_BKPEMC                  ((uint8_t)((CSR_REG_INDEX << 5U) | RCC_CSR_BKPEMCF_Pos))  /*!< Backup domain EMC reset flag */
+#define RCC_FLAG_RAMRST                  ((uint8_t)((CSR_REG_INDEX << 5U) | RCC_CSR_RAMRSTF_Pos))  /*!< RAM reset flag */
+
+#define RCC_FLAG_MMURST                  ((uint8_t)((CSR_REG_INDEX << 5U) | RCC_CSR_MMURSTF_Pos))  /*!< MPU reset flag */
 #define RCC_FLAG_PINRST                  ((uint8_t)((CSR_REG_INDEX << 5U) | RCC_CSR_PINRSTF_Pos))  /*!< PIN reset flag */
 #define RCC_FLAG_PORRST                  ((uint8_t)((CSR_REG_INDEX << 5U) | RCC_CSR_PORRSTF_Pos))  /*!< POR/PDR reset flag */
 #define RCC_FLAG_SFTRST                  ((uint8_t)((CSR_REG_INDEX << 5U) | RCC_CSR_SFTRSTF_Pos))  /*!< Software Reset flag */

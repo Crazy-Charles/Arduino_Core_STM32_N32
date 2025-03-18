@@ -59,7 +59,7 @@
  */
 
 // Architecture specific include
-#include "N32G45x/ServoTimers.h"
+#include "ServoTimers.h"
 
 
 #define Servo_VERSION           2     // software version of this library
